@@ -1,0 +1,15 @@
+                    START
+
+Egy TCP socket létrehozása és egy szál ami csak fogad
+Ha sikeres akkor bejelentkezes kovetkezik
+
+                    bejelentkezes
+
+A felhasználó beír egy nevet és elküldi a szervernek
+Attól függően, hogy van-e már olyan személy attól
+függően visszaküldi, hogy OK/NO, addig kér új nevet
+míg a szerver "OK"-ot küld
+
+A nev nem lehet hosszabb, mint 10 karakter
+
+

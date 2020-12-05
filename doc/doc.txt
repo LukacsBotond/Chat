@@ -1,0 +1,38 @@
+g++ -o server *.cpp -lpthread -std=c++17
+
+Server
+
+Indulaskor előkészíti a socketet és szemafort, majd vár míg valaki csatlakozik
+és csinál egy szálat ami azzal a klienssel foglalkozik
+
+---Bejelentkezes:
+    mindenki belépéskor egy max 10 char hosszú nevet választ
+
+
+Protokol
+
+-all uzenet 
+    vagy 
+    -a uzenet   //mindenkinek elküldi az üzenetet
+
+-list 
+    vagy 
+    -l //a kert kliensnek visszaküldi az összes aktív felhasználót
+
+-priv cimzett uzenet 
+    vagy 
+    -p cimzett uzenet //privát uzenet egy felhasználónak
+
+-file fajlnev
+    -all //mindenkinek
+    -p felh //valakinek
+    -g csoportnev //csoportnak
+
+-create chatszoba
+    vagy
+    -c chatszoba 
+    //létrehoz egy chat szobát, a kliens aki létrehozta automatikusan benne van
+
+-join chatszoba
+    vagy
+    -j chatszoba //csatlakozik egy chat szobához ha létezik

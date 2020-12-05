@@ -1,0 +1,43 @@
+csomag méret 512 byte
+
+Tipus: (1 byte)
+    0-privát
+    1-all
+    2-csoport
+    3-fajl
+    4-Bejelentkezes
+
+Sorszám: hányadik csomag: (4 byte)
+
+Adat: maragek charaker, ha nincs annyi akkor 0-val feltölteni
+
+-----------------------mindenkinek
+tipus 1
+Sorszám x
+uzenet
+
+-----------------------privát uzenet
+tipus 0
+Sorszám x
+azutan 10 byte a fogado neve
+majd adat
+
+-----------------------chat szoba
+tipus 2
+Sorszám x
+azutan 10 byte a chatszoba neve
+majd adat
+
+-----------------------fajl küldés
+tipus 3
+Sorszám x
+azutan 10 byte a fogado neve
+majd adat
+
+-----------------------Bejelentkezes
+tipus 4
+adat tobbi
+
+-----------------------Valasz
+tipus amilyen az erkezett csomag
+Valasz
