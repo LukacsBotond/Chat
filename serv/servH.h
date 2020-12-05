@@ -41,9 +41,12 @@ bool nameSet(int clientSocket, int id);
 
 void *Communicate(void *threadarg);
 
+//all tipusu uzenetkent kulve vissza, de csak annak aki kerdezte
 void SendNames(int sock);
 
 void sendAll(char* data);
+
+bool sendValsz(int sock,std::string data);
 
 int elsoUresSzal();
 
@@ -54,5 +57,15 @@ void printNevek();
 
 void threadExit(int id, int sock);
 void kilep(void);
+
+
+
+///////////////////////////// SUpport functions
+
+unsigned int getSorszam(std::vector<char> buf);
+bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
+bool valasz(int sock, unsigned int &sorszam, unsigned int &csomagszamlal);
+
+
 
 #endif

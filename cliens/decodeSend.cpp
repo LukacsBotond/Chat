@@ -1,11 +1,12 @@
 #include "../common/packages.h"
+#include "../common/comon.h"
 #include "decode.h"
 #include <sstream>
 
 using namespace std;
 
 //a felhasznalo altal megadott parancsot ertelmezi
-bool decodeCommand(string userInput)
+bool decodeCommand()
 {
     int kezdo = 0;
     cout << "DECODE\n";
@@ -35,17 +36,22 @@ bool AllSend(string uzenet)
     int kezdo = 0;
     int sorszam = 0;
     int osszcsomag = (uzenet.length() / 507) + 1;
-
-    int res;
     for (int i = 0; i < osszcsomag; i++)
     {
+        //szemafor csokkentese, majd mikor a szerver
+        //visszaigazol, hogy jo akkor mehet tovabb
+        if (semop(semid, &down, 1) < 0)
+        {
+            cout << "Sem down error" << endl;
+            return false;
+        }
         string pack;
         //send
         try
-        {   //utolso csomag
+        { //utolso csomag
             if (i == osszcsomag - 1)
             {
-                pack = AllPackageGEN(uzenet.substr(kezdo, 507), sorszam);
+                pack = AllPackageGEN(uzenet.substr(kezdo), UINT32_MAX);
             }
             else
             {
@@ -69,19 +75,23 @@ bool AllSend(string uzenet)
             continue;
         }
 
-        res = send(sock, pack.c_str(), 512, 0);
-        cout << "res: " << res << endl;
-        if (res == -1)
-        {
-            cout << "Nem sikerult a szerverhez elkuldeni \n";
-            continue;
+        if(!sendPack(pack)){
+            return false;
         }
 
-        //wait for the server to respond
-        //update after it was succesfully recived
         kezdo += 507;
         sorszam++;
     }
+    return true;
+}
 
+bool sendPack(string pack)
+{
+    int res = send(sock, pack.c_str(), 513, 0);
+    cout << "res: " << res << endl;
+    if (!resCheck(res))
+    {
+        return false;
+    }
     return true;
 }

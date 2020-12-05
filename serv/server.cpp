@@ -1,4 +1,6 @@
 #include "servH.h"
+#include "../common/packages.h"
+#include "../common/comon.h"
 #include <sstream>
 
 using namespace std;
@@ -7,6 +9,7 @@ using namespace std;
 void *Communicate(void *threadarg)
 {
     struct thread_data *my_data;
+    unsigned int csomagszamlal = 0;
     my_data = (struct thread_data *)threadarg;
 
     while (nameSet(my_data->clientSocket, my_data->id) == false)
@@ -15,30 +18,21 @@ void *Communicate(void *threadarg)
 
     while (true)
     {
-        std::vector<char> buf(515);
+        vector<char> buf(515);
 
         int res = recv(my_data->clientSocket, buf.data(), 515, 0);
-        cout<<"res: "<<res<<endl;
-        if (res < 0)
+        cout << "res: " << res << endl;
+        if (!resCheck(res))
         {
-            if (errno == EINTR)
-            {
-                // Interrupted, just try again ...
-                continue;
-            }
-            else
-            {
-                cout << "RECV error, exit thread\n";
-                threadExit(my_data->id, my_data->clientSocket);
-            }
+            threadExit(my_data->id, my_data->clientSocket);
         }
-        if (res == 0)
-        {
-            cout << "kliens kilepett\n";
+        vector<int> adat;
+        unsigned int sorszam = getSorszam(buf);
+
+        if(!valasz(my_data->clientSocket,sorszam,csomagszamlal)){
             threadExit(my_data->id, my_data->clientSocket);
         }
 
-        vector<int> adat;
         //milyen tipus erkezik
         switch (buf.at(0))
         {
@@ -54,10 +48,12 @@ void *Communicate(void *threadarg)
             break;
         }
 
-        cout<<"beerkezo adat kiirasa\n";
+
+
+        cout << "beerkezo adat kiirasa\n";
         for (unsigned int i = 0; i < adat.size(); i++)
         {
-            cout <<(char) adat.at(i);
+            cout << (char)adat.at(i);
         }
         cout << "\nREVC vege" << endl;
     }

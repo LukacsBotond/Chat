@@ -25,9 +25,9 @@ struct RetRegPackage{
     char adat[511]={0};//nev
 };
 //sorszam intet char tombbe alakitja, hogy at lehessen kuldeni
-unsigned char* IntToChar(unsigned char ures[4], int sorszam);
+unsigned char* IntToChar(unsigned char ures[4],unsigned int sorszam);
 //visszaalakitja a char tombot
-int CharToInt(unsigned char CsorSz[4]);
+unsigned int CharToInt(unsigned char CsorSz[4]);
 
 //belepesre es szerver visszaigazolasra is jo
 std::string RetRegPackageGEN(char type,std::string adat);
@@ -36,11 +36,13 @@ std::string RetRegPackageGEN(char type,std::string adat);
 //megadjuk a stringet amit el akarunk kuldeni es a csomag szamat
 //a csomag szama alapjan csinal egy csomagot egy resz
 //stringgel, 
-std::string AllPackageGEN(std::string data,int sorszam);
+std::string AllPackageGEN(std::string data,unsigned int sorszam);
 
-std::string PrivPackageGEN(char type,int sorszam,std::string fogado,std::string data);
+std::string PrivPackageGEN(char type,unsigned int sorszam,std::string fogado,std::string data);
 
 //0-kat ir a string vegere, hogy meglegyen a csomag merete
-std::string fillData(std::string adat,int length);
+std::string fillData(std::string adat,unsigned int length);
+
+
 
 #endif

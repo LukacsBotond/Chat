@@ -4,7 +4,7 @@
 
 using namespace std;
 
-unsigned char *IntToChar(unsigned char ures[4], int sorszam)
+unsigned char *IntToChar(unsigned char ures[4], unsigned int sorszam)
 {
     for (int i = 3; i >= 0; i--)
     {
@@ -14,7 +14,7 @@ unsigned char *IntToChar(unsigned char ures[4], int sorszam)
     return ures;
 }
 
-int CharToInt(unsigned char *CsorSz)
+unsigned int CharToInt(unsigned char *CsorSz)
 {
     int sorszam = 0;
     int mult = 1;
@@ -26,10 +26,10 @@ int CharToInt(unsigned char *CsorSz)
     return sorszam;
 }
 
-std::string fillData(string adat, int length)
+std::string fillData(string adat,unsigned int length)
 {
-    int adatLen = adat.length();
-    for (int i = adatLen; i < length; i++)
+    unsigned int adatLen = adat.length();
+    for (unsigned int i = adatLen; i < length; i++)
     {
         adat += (char)0;
     }
@@ -48,7 +48,7 @@ string RetRegPackageGEN(char type, std::string adat)
     return csomag;
 }
 
-string AllPackageGEN(string data, int sorszam)
+string AllPackageGEN(string data, unsigned int sorszam)
 {
     if (data.length() == 0)
     {
@@ -56,6 +56,12 @@ string AllPackageGEN(string data, int sorszam)
     }
 
     unsigned int kezdo = sorszam * 507;
+
+    if(sorszam == UINT32_MAX){
+        int l = data.length();
+        int parts=l/507;
+        kezdo = (507*parts);
+    }
     if (kezdo >= data.length())
     {
         throw out_of_range("tul nagy a csomag indexe");
@@ -73,7 +79,7 @@ string AllPackageGEN(string data, int sorszam)
     return csomag;
 }
 
-string PrivPackageGEN(char type,int sorszam,string fogado,std::string data){
+string PrivPackageGEN(char type,unsigned int sorszam,string fogado,std::string data){
     if (data.length() == 0)
     {
         throw length_error("Nincs string");

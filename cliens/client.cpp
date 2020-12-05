@@ -1,98 +1,25 @@
 #include "decode.h"
 #include "../common/packages.h"
+#include "../common/comon.h"
 
 using namespace std;
-
-void kilep(void)
-{
-    cout << "KILEPES\n";
-    pthread_exit(&threads[0]);
-    close(sock);
-}
 
 void *recv(void *threadarg)
 {
     struct thread_data *my_data;
     my_data = (struct thread_data *)threadarg;
-    char buf[8000];
-    memset(buf, 0, 8000);
+    vector<char> buf(515);
     while (true)
     {
-        int bytesReceived = recv(my_data->sock, buf, 8000, 0);
-        if (bytesReceived == -1)
-        {
-            cout << "There was an error getting response from server\r\n";
-        }
-        if (bytesReceived == 0)
-        {
-            cout << "Server disconnected\n";
+        int bytesReceived = recv(my_data->sock, buf.data(), 515, 0);
+        if(!resCheck(bytesReceived)){
             exit(0);
         }
-        else
-        {
-            cout << "SERVER> " << string(buf, bytesReceived) << "\r\n";
-        }
+
     }
     close(my_data->sock);
 
     pthread_exit(NULL);
-}
-
-void sendName()
-{
-    int res;
-    while (true)
-    {
-        string name;
-        string Retpack = "";
-        cout << "Irjon egy felhasznalo nevet: ";
-        getline(cin, name);
-
-        if (name.length() > 10)
-        {
-            cout << "A nev tul hosszu, max 10 karakter!\n";
-            continue;
-        }
-        try
-        {
-            Retpack = RetRegPackageGEN(4, name);
-        }
-        catch (length_error &e)
-        {
-            cout << e.what() << '\n';
-            continue;
-        }
-
-        //Send to server
-        res = send(sock, Retpack.c_str(), Retpack.length() + 1, 0);
-        if (res == -1)
-        {
-            cout << "nem sikerult a szerverhez kuldeni!\r\n";
-            exit(-1);
-        }
-
-        std::vector<char> buf(515);
-        res = recv(sock, buf.data(), 515, 0);
-        if (res == -1)
-        {
-            cout << "There was an error getting response from server\r\n";
-        }
-        if (res == 0)
-        {
-            cout << "Server disconnected\n";
-            exit(0);
-        }
-        cout << buf.at(0) << buf.at(1);
-        if (buf.at(0) == 'O' && buf.at(1) == 'K')
-        {
-            cout << "sikeres Nev beiras" << endl;
-            break;
-        }
-        else
-        {
-            cout << "A nev foglalt probaljon mas nevet" << endl;
-        }
-    }
 }
 
 int main()
@@ -102,7 +29,7 @@ int main()
     string test;
     try
     {
-        test = AllPackageGEN(data, 0);
+        test = AllPackageGEN(data,UINT32_MAX);
         cout << "END" << endl;
     }
     catch (out_of_range &e)
@@ -181,12 +108,11 @@ int main()
     cout<<"-priv cimzett uzenet vagy -p cimzett uzenet Privat uzenet kuldese egy felhasznalonak";
     cout<<"-file fajlnev vagy -f fajlnev\n -all mindenkinek \n-p felhasznalonev felhasznalonak \n-g csoportnev csoportnak\n";
 
-    string userInput;
     do
     { //		Enter lines of text
         cout << "> ";
         getline(cin, userInput);
-        if(!decodeCommand(userInput)){
+        if(!decodeCommand()){
             cout<<"Hiba tortent, probalja ujra"<<endl;
         }
     } while (true);

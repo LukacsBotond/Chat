@@ -6,6 +6,7 @@ Tipus: (1 byte)
     2-csoport
     3-fajl
     4-Bejelentkezes
+    5-list
 
 Sorszám: hányadik csomag: (4 byte)
 
@@ -39,5 +40,5 @@ tipus 4
 adat tobbi
 
 -----------------------Valasz
-tipus amilyen az erkezett csomag
+tipus 10
 Valasz

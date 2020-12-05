@@ -1,5 +1,6 @@
 #include "servH.h"
 #include "../common/packages.h"
+#include "../common/comon.h"
 
 using namespace std;
 
@@ -10,14 +11,7 @@ bool nameSet(int clientSocket, int id)
     int res;
     //read nameset package
     res = recv(clientSocket, buf, 513, 0);
-    if (res == -1)
-    {
-        cout << "Error in recv(). Quitting" << endl;
-        return false;
-    }
-    if (res == 0)
-    {
-        cout << "Client disconnected " << endl;
+    if(!resCheck(res)){
         threadExit(id, clientSocket);
     }
     string nev="";
@@ -74,34 +68,6 @@ bool nameSet(int clientSocket, int id)
         }
     }
     
-}
-
-void SendNames(int sock)
-{
-    if (semop(semid, &down, 1) < 0)
-    {
-        cout << "Sem down error" << endl;
-        return;
-    }
-    string RetNev = "A szerveren aktiv felhasznalok: ";
-    for (int i = 0; i < NUM_THREADS; i++)
-    {
-        if (nevek[i] != "")
-        {
-            RetNev += (nevek[i] + ' ');
-        }
-    }
-    int bytessend = send(sock, RetNev.c_str(), RetNev.length() + 1, 0);
-    if (bytessend == -1)
-    {
-        cout << "hiba a kuldes soran\n";
-    }
-
-    if (semop(semid, &up, 1) < 0)
-    {
-        cout << "Sem down error" << endl;
-        return;
-    }
 }
 
 int elsoUresSzal()
