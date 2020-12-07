@@ -9,7 +9,6 @@ using namespace std;
 bool decodeCommand()
 {
     int kezdo = 0;
-    cout << "DECODE\n";
     string command;
     string param1, param2;
     string adat;
@@ -28,7 +27,17 @@ bool decodeCommand()
         kezdo = 3;
         return AllSend(userInput.substr(kezdo));
     }
+    if (buf == "-l" || buf == "-list"){
+        return ListSend();
+    }
+
+
     return false;
+}
+
+bool ListSend(){
+    string retPack = RetRegPackageGEN('5',"list");
+    return sendPack(sock,retPack);
 }
 
 bool AllSend(string uzenet)
@@ -38,13 +47,6 @@ bool AllSend(string uzenet)
     int osszcsomag = (uzenet.length() / 507) + 1;
     for (int i = 0; i < osszcsomag; i++)
     {
-        //szemafor csokkentese, majd mikor a szerver
-        //visszaigazol, hogy jo akkor mehet tovabb
-        if (semop(semid, &down, 1) < 0)
-        {
-            cout << "Sem down error" << endl;
-            return false;
-        }
         string pack;
         //send
         try
@@ -75,23 +77,12 @@ bool AllSend(string uzenet)
             continue;
         }
 
-        if(!sendPack(pack)){
+        if(!sendPack(sock,pack)){
             return false;
         }
 
         kezdo += 507;
         sorszam++;
-    }
-    return true;
-}
-
-bool sendPack(string pack)
-{
-    int res = send(sock, pack.c_str(), 513, 0);
-    cout << "res: " << res << endl;
-    if (!resCheck(res))
-    {
-        return false;
     }
     return true;
 }

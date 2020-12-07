@@ -4,6 +4,32 @@
 
 using namespace std;
 
+bool decodeRECV(std::vector<char> buf,int sock)
+{
+    unsigned int sorszam = getSorszam(buf);
+    string csomag(buf.begin(), buf.end());
+    //milyen tipus erkezik
+    switch (buf.at(0))
+    {
+    //mindenkinek kuldes
+    case 1:
+        cout << "-ALL parancs erkezett" << endl;
+        sendAll(csomag);
+        return true;
+        break;
+    case 5:
+        cout<<"-list parancs erkezett\n";
+        SendNames(sock);
+        return true;
+        break;
+
+    default:
+        cout<<"Nincs ilyen parancs\n";
+        return false;
+        break;
+    }
+    return false;
+}
 
 bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
 {
@@ -13,31 +39,4 @@ bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
         return true;
     }
     return false;
-}
-
-bool valasz(int sock, unsigned int &sorszam, unsigned int &csomagszamlal)
-{
-    if (sorszam == UINT32_MAX)
-    { //utolso csomag a kuldotol
-        csomagszamlal = 0;
-        return sendValsz(sock, "OK");
-    }
-    else
-    //varakozas a kommunikacio kovetkezo csomagjara
-    {
-        if (correctPack(sorszam, csomagszamlal))
-        {
-            return sendValsz(sock, "OK");
-            csomagszamlal++;
-        }
-        else
-        {
-            //ha nem jo akkor visszakuldi az utolso jo csomag
-            //sorszamat
-            unsigned char* sorsz = IntToChar(uresChar,csomagszamlal);
-            string val(reinterpret_cast<char*>(sorsz));
-            val=val.substr(0,4);
-            return sendValsz(sock,val);
-        }
-    }
 }

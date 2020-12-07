@@ -4,26 +4,21 @@
 
 using namespace std;
 
-void sendAll(char *data)
+void sendAll(string csomag)
 {
     if (semop(semid, &down, 1) < 0)
     {
         cout << "Sem down error" << endl;
         exit(-1);
     }
-    /*
-        int semval = semctl(semid, 0, GETVAL, 1);
-        cout << "SEMVAL: " << semval << endl;
-        cout << "ENTER critical section\n";
-        */
     for (int i = 0; i < NUM_THREADS; i++)
     {
         if (!szal[i])
         {
             continue;
         }
-        int bytessend = send(td[i].clientSocket, data, strlen(data) + 1, 0);
-        if (bytessend == -1)
+        //int bytessend = send(td[i].clientSocket, csomag.c_str(), 513, 0);
+        if (!sendPack(td[i].clientSocket, csomag))
         {
             cout << "hiba a kuldes soran\n";
         }
@@ -37,27 +32,7 @@ void sendAll(char *data)
     }
 }
 
-bool sendValsz(int sock, string data)
-{
-    string Retpack = "";
-    try
-    {
-        Retpack = RetRegPackageGEN(10,data);
-    }
-    catch (length_error &e)
-    {
-        cout << e.what() << '\n';
-    }
-
-    int res = send(sock, Retpack.c_str(), Retpack.length() + 1, 0);
-    cout << "res: " << res << endl;
-    if (!resCheck(res))
-    {
-        return false;
-    }
-    return true;
-}
-
+//repair
 void SendNames(int sock)
 {
     if (semop(semid, &down, 1) < 0)
@@ -73,17 +48,19 @@ void SendNames(int sock)
             RetNev += (nevek[i] + ' ');
         }
     }
-    int bytessend = send(sock, RetNev.c_str(), RetNev.length() + 1, 0);
-    if (bytessend == -1)
-    {
-        cout << "hiba a kuldes soran\n";
+    int kezdo = 0;
+    string returnPack;
+    unsigned int osszcsomag = (RetNev.length() / 511) + 1;
+    for(unsigned int i=0;i<osszcsomag;i++){
+        returnPack=RetRegPackageGEN('5',RetNev.substr(kezdo,511));
+        if(!sendPack(sock,returnPack)){
+            cout<<"HIBA NEV kuldeskor\n";
+            return;
+        }
     }
-
     if (semop(semid, &up, 1) < 0)
     {
-        cout << "Sem down error" << endl;
+        cout << "Sem up error" << endl;
         return;
     }
 }
-
-

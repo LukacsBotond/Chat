@@ -9,22 +9,33 @@ void kilep(void)
     cout << "KILEPES\n";
     pthread_exit(&threads[0]);
     close(sock);
+    exit(0);
 }
 
-void semStart()
+void MakeSocket()
 {
-    ////////////////////////// SZEMAFOR /////////////////////
-    if ((semid = semget(IPC_PRIVATE, 1, 0660 | IPC_CREAT)) < 0)
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1)
     {
-        cout << "semget error" << endl;
-        exit(-1);
+        cout << "socket error" << endl;
+        exit(1);
     }
 
-    short init[1] = {1};
-    if (semctl(semid, 0, SETALL, init) < 0)
+    //	Create a hint structure for the server we're connecting with
+    int port = 54000;
+    string ipAddress = "127.0.0.1";
+
+    sockaddr_in hint;
+    hint.sin_family = AF_INET;
+    hint.sin_port = htons(port);
+    inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
+
+    //	Connect to the server on the socket
+    int connectRes = connect(sock, (sockaddr *)&hint, sizeof(hint));
+    if (connectRes == -1)
     {
-        cout << "INIT\n";
-        exit(-1);
+        cout << "connect error" << endl;
+        exit(1);
     }
 }
 
@@ -54,20 +65,21 @@ void sendName()
         }
 
         //Send to server
-        if(!sendPack(Retpack)){
+        if (!sendPack(sock, Retpack))
+        {
             exit(-1);
         }
 
+        //var a szerver valaszara
         std::vector<char> buf(515);
         res = recv(sock, buf.data(), 515, 0);
         if (!resCheck(res))
         {
             exit(-1);
         }
-        cout << buf.at(0) << buf.at(1);
         if (buf.at(0) == 'O' && buf.at(1) == 'K')
         {
-            cout << "sikeres Nev beiras" << endl;
+            cout << "Sikeres Nev beiras" << endl;
             break;
         }
         else

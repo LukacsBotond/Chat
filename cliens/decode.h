@@ -1,20 +1,10 @@
 #ifndef DECODE_H
 #define DECODE_H
 
-#include <iostream>
-#include <pthread.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <string.h>
-#include <string>
-#include <vector>
+#include "../common/comon.h"
+#include "../common/packages.h"
 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
+inline bool vege = false;
 
 inline int sock;
 inline unsigned int sorszam = 0;
@@ -40,10 +30,13 @@ bool decodeCommand();
 
 
 bool AllSend(std::string uzenet);
+bool ListSend();
 
-bool sendPack(std::string pack);
-
-
+//szervertol kapott adat feldolgozasa
 void decodeRevc(std::vector<char> buf);
+
+
+void kilep(void);
+void MakeSocket();
 
 #endif

@@ -18,137 +18,22 @@ void *Communicate(void *threadarg)
 
     while (true)
     {
-        vector<char> buf(515);
+        vector<char> buf(550);
 
-        int res = recv(my_data->clientSocket, buf.data(), 515, 0);
+        int res = recv(my_data->clientSocket, buf.data(), 550, 0);
         cout << "res: " << res << endl;
         if (!resCheck(res))
         {
+            cout<<"EXIT RES\n";
             threadExit(my_data->id, my_data->clientSocket);
         }
-        vector<int> adat;
-        unsigned int sorszam = getSorszam(buf);
-
-        if(!valasz(my_data->clientSocket,sorszam,csomagszamlal)){
+        if(!decodeRECV(buf,my_data->clientSocket)){
+            cout<<"EXIT RECV\n";
             threadExit(my_data->id, my_data->clientSocket);
         }
 
-        //milyen tipus erkezik
-        switch (buf.at(0))
-        {
-        //mindenkinek kuldes
-        case 1:
-            cout << "-ALL parancs erkezett" << endl;
-            adat = {buf.begin() + 5, buf.end()};
-            break;
-
-        default:
-            threadExit(my_data->id, my_data->clientSocket);
-            //throw runtime_error("Not implemented function");
-            break;
-        }
-
-
-
-        cout << "beerkezo adat kiirasa\n";
-        for (unsigned int i = 0; i < adat.size(); i++)
-        {
-            cout << (char)adat.at(i);
-        }
         cout << "\nREVC vege" << endl;
     }
-    /*
-    //amig 
-    while (nameSet(my_data->clientSocket, my_data->id) == false);
-    cout << "Succesfull name set" << endl;
-
-    string command;
-
-    printNevek();
-
-    while (true)
-    {
-        int offset = 0;
-        std::vector<char> buf(512);
-        bool first = true;
-        char test[513];
-        while (true)
-        {
-            int res = recv(my_data->clientSocket,test,512, 0);
-            //int res = recv(my_data->clientSocket, buf.data() + offset, buf.size() - offset, 0);
-            if (res < 0)
-            {
-                if (errno == EINTR)
-                {
-                    // Interrupted, just try again ...
-                    continue;
-                }
-                else
-                {
-                    cout << "RECV error, exit thread\n";
-                    threadExit(my_data->id, my_data->clientSocket);
-                }
-            }
-            if (res == 0)
-            {
-                if (offset == 0)
-                {
-                    // Client did just close the connection
-                    cout << "Cliens disconnected, exit thread\n";
-                    threadExit(my_data->id, my_data->clientSocket);
-                }
-                else
-                {
-                    cout << "RECV error unexpected end, exit thread\n";
-                    threadExit(my_data->id, my_data->clientSocket);
-                }
-            }
-            //megkeresi a protokol parametereket
-            if(first){
-                first = false;
-                cout<<"ELSO resz: "<<endl<<endl;
-            }
-            test[res]='\0';
-            cout<<test;
-            if (res == 512) //van meg
-            {
-                cout<<"van meg "<<offset<<endl;
-                offset += res;
-                
-                
-                buf.resize(buf.size()+res); // double available memory
-                
-               
-               cout<<test;
-            }
-            else //vege
-            {   
-                offset += res;
-                cout<<"vege "<<offset<<endl;
-                offset += res;
-                for (int i = 0; i < buf.size(); i++)
-                {
-                    cout << buf.at(i);
-                }
-                cout << endl;
-                break;
-            }
-        }
-        
-        if (strcmp(buf, "/list") == 0)
-        {
-            SendNames(my_data->clientSocket);
-        }
-        if (strncmp(buf, "/all", 4) == 0)
-        {
-            sendAll(buf);
-        }
-        //szerver kiir mindent amit kapott
-        
-        cout << string(buf, 0, res) << endl;
-        
-    }
-    */
     threadExit(my_data->id, my_data->clientSocket);
 }
 

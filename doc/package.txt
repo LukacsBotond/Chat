@@ -39,6 +39,6 @@ majd adat
 tipus 4
 adat tobbi
 
------------------------Valasz
-tipus 10
-Valasz
+-----------------------list
+tipus 5
+adat tobbi

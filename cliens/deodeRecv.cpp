@@ -6,26 +6,19 @@ using namespace std;
 
 void decodeRevc(vector<char> buf)
 {
-
+    int kezd=0;
     switch (buf.at(0))
     {
-    case 10: //visszaigazolo uzenet
-        if (buf.at(1) == 'O' && buf.at(2) == 'K')
-        {
-            if (semop(semid, &up, 1) < 0)
-            {
-                cout << "Sem up error" << endl;
-                return;
-            }
-        }
-        else
-        {
-            unsigned int sorszam = getSorszam(buf);
-            string pack;
-        }
+    case 1://all-parancs erkezett
+        kezd = 5;
+        break;
+    case 5:
+        kezd = 1;
         break;
 
     default:
         break;
     }
+     string uzenet(buf.begin()+kezd,buf.end());
+    cout<<"SERVER>:"<<uzenet<<endl;
 }

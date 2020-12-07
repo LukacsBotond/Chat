@@ -75,7 +75,6 @@ string AllPackageGEN(string data, unsigned int sorszam)
     csomag[0]=1;
     
     csomag += fillData(data.substr(kezdo, 507),507);
-    cout << "csomag: "<<csomag << endl;
     return csomag;
 }
 

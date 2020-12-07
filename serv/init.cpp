@@ -7,10 +7,10 @@ using namespace std;
 bool nameSet(int clientSocket, int id)
 {
     cout << "NAMESET start" << endl;
-    char buf[513];
+    char buf[515];
     int res;
     //read nameset package
-    res = recv(clientSocket, buf, 513, 0);
+    res = recv(clientSocket, buf, 515, 0);
     if(!resCheck(res)){
         threadExit(id, clientSocket);
     }
@@ -49,8 +49,10 @@ bool nameSet(int clientSocket, int id)
         return false;
     }
     ////////////////////////////////////////////////////////////
-    res = send(clientSocket, RetPack.c_str(), RetPack.length()+1, 0);
-    if (res == -1)
+    
+    
+    //res = send(clientSocket, RetPack.c_str(), RetPack.length()+1, 0);
+    if (!sendPack(clientSocket,RetPack))
     {
         cout << "hiba a kuldes soran\n";
         return false;
@@ -152,6 +154,7 @@ void threadExit(int id, int sock)
 {
     // Close the socket
     close(sock);
+    cout<<"SZAL lezarasa\n";
     if (semop(semid, &down, 1) < 0)
     {
         cout << "Sem down error" << endl;

@@ -44,7 +44,7 @@ void *Communicate(void *threadarg);
 //all tipusu uzenetkent kulve vissza, de csak annak aki kerdezte
 void SendNames(int sock);
 
-void sendAll(char* data);
+void sendAll(std::string csomag);
 
 bool sendValsz(int sock,std::string data);
 
@@ -64,8 +64,8 @@ void kilep(void);
 
 unsigned int getSorszam(std::vector<char> buf);
 bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
-bool valasz(int sock, unsigned int &sorszam, unsigned int &csomagszamlal);
 
+bool decodeRECV(std::vector<char> buf,int sock);
 
 
 #endif
