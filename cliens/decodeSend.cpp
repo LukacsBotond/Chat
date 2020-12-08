@@ -2,6 +2,7 @@
 #include "../common/comon.h"
 #include "decode.h"
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -35,6 +36,10 @@ bool decodeCommand()
     {
         return SendPriv();
     }
+    if (buf == "-file" || buf == "-f")
+    {
+        return SendFile();
+    }
 
     return false;
 }
@@ -58,11 +63,11 @@ bool AllSend(string uzenet)
         { //utolso csomag
             if (i == osszcsomag - 1)
             {
-                pack = AllPackageGEN(uzenet.substr(kezdo), UINT32_MAX);
+                pack = AllPackageGEN('1',uzenet.substr(kezdo), UINT32_MAX);
             }
             else
             {
-                pack = AllPackageGEN(uzenet.substr(kezdo, 507), sorszam);
+                pack = AllPackageGEN('1',uzenet.substr(kezdo, 507), sorszam);
             }
         }
         catch (out_of_range &e)
@@ -94,9 +99,9 @@ bool SendPriv()
     stringstream ss(userInput);
     int kezdo = 0;
     ss >> buf; //ez a -priv lesz
-    kezdo+=buf.length();
+    kezdo += buf.length();
     ss >> buf; //a nev
-    kezdo+=buf.length()+1;
+    kezdo += buf.length() + 1;
     fogado = buf;
     int sorszam = 0;
     int osszcsomag = (userInput.length() / 497) + 1;
@@ -109,11 +114,11 @@ bool SendPriv()
         { //utolso csomag
             if (i == osszcsomag - 1)
             {
-                pack = PrivPackageGEN('0',UINT32_MAX,fogado,adat);
+                pack = PrivPackageGEN('0', UINT32_MAX, fogado, adat);
             }
             else
             {
-                pack = PrivPackageGEN('0',sorszam,fogado,adat);
+                pack = PrivPackageGEN('0', sorszam, fogado, adat);
             }
         }
         catch (out_of_range &e)
@@ -136,6 +141,54 @@ bool SendPriv()
         sorszam++;
     }
     return true;
+
+    return true;
+}
+
+bool SendFile()
+{
+    string buf;
+    string fajlnev;
+    string csomag = "";
+    unsigned int sorszam = 1;
+    //elso csomag
+    string tmp;
+    stringstream ss(userInput);
+    ss >> tmp; //-file skip
+
+    ss >> tmp; //fajlnev
+    fajlnev = tmp;
+    cout << fajlnev << endl;
+    ifstream sendFile(fajlnev, std::ifstream::binary);
+    if (sendFile.fail())
+    {
+        cout << "nincs ilyen fajl\n";
+        return false;
+    }
+
+    csomag = PrivPackageGEN('3', 0, "fill", userInput);
+    if (!sendPack(sock, csomag))
+    {
+        return false;
+    }
+    vector<char> resz(550);
+    while (!sendFile.eof())
+    {
+        cout << "sending...."<<sorszam<<endl;
+        sendFile.read(resz.data(), 507);
+        string reszCs(resz.begin(), resz.end());
+        //cout<<reszCs<<endl;
+        csomag = FilePackGen('3', reszCs, sorszam);
+        if (!sendPack(sock, csomag))
+        {
+            cout << "valami nem jo" << endl;
+            return false;
+        }
+        sorszam++;
+    }
+    //vege a fajlnak
+    cout<<"Elkuldve\n";
+    csomag = PrivPackageGEN('3', UINT32_MAX, "fill", "fill");
 
     return true;
 }

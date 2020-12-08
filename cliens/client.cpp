@@ -24,38 +24,6 @@ void *recv(void *threadarg)
 
 int main()
 {
-    /*
-    string data = "ALMAFA DE NAGY";
-    string test;
-    try
-    {
-        test = AllPackageGEN(data,UINT32_MAX);
-        cout << "END" << endl;
-    }
-    catch (out_of_range &e)
-    {
-        std::cout<< e.what() << '\n';
-    }
-    catch (length_error &e)
-    {
-        std::cout << e.what() << '\n';
-    }
-
-    try
-    {
-        test = PrivPackageGEN('0', 0, "BOB", data);
-        cout << "END" << endl;
-    }
-    catch (out_of_range &e)
-    {
-        std::cout << e.what() << '\n';
-    }
-    catch (length_error &e)
-    {
-        std::cout << e.what() << '\n';
-    }
-*/
-    
     atexit(kilep);
     pthread_t threads[1];
     struct thread_data td[1];
@@ -83,7 +51,7 @@ int main()
     cout<<"-all uzenet vagy -a uzenet :Mindenki aki csatlakozva van kuld egy uzenetet\n";
     cout<<"-list vagy -l Visszateriti az aktiv felhasznalokat\n";
     cout<<"-priv cimzett uzenet vagy -p cimzett uzenet :Privat uzenet kuldese egy felhasznalonak\n";
-    cout<<"-file fajlnev vagy -f fajlnev\n\t-all mindenkinek \n\t-p felhasznalonev felhasznalonak \n\t-g csoportnev csoportnak\n\n\n";
+    cout<<"-file fajlnev vagy -f fajlnev\n\t-a mindenkinek \n\t-p felhasznalonev felhasznalonak \n\t-g csoportnev csoportnak\n\n\n";
 
     do
     { //		Enter lines of text

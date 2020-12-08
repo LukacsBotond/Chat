@@ -32,6 +32,7 @@ bool decodeCommand();
 bool AllSend(std::string uzenet);
 bool ListSend();
 bool SendPriv();
+bool SendFile();
 
 //szervertol kapott adat feldolgozasa
 void decodeRevc(std::vector<char> buf);

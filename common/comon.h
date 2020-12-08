@@ -8,6 +8,6 @@ bool resCheck(int res);
 
 unsigned int getSorszam(std::vector<char> buf);
 
-bool sendPack(int socket,std::string pack);
+bool sendPack(int socket, std::string pack);
 
 #endif

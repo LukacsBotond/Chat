@@ -9,7 +9,6 @@ using namespace std;
 void *Communicate(void *threadarg)
 {
     struct thread_data *my_data;
-    unsigned int csomagszamlal = 0;
     my_data = (struct thread_data *)threadarg;
 
     while (nameSet(my_data->clientSocket, my_data->id) == false)
@@ -19,7 +18,6 @@ void *Communicate(void *threadarg)
     while (true)
     {
         vector<char> buf(550);
-
         int res = recv(my_data->clientSocket, buf.data(), 550, 0);
         cout << "res: " << res << endl;
         if (!resCheck(res))

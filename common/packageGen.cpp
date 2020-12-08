@@ -48,7 +48,7 @@ string RetRegPackageGEN(char type, std::string adat)
     return csomag;
 }
 
-string AllPackageGEN(string data, unsigned int sorszam)
+string AllPackageGEN(char type, string data, unsigned int sorszam)
 {
     if (data.length() == 0)
     {
@@ -70,16 +70,34 @@ string AllPackageGEN(string data, unsigned int sorszam)
             throw out_of_range("tul nagy a csomag indexe");
         }
     }
-    string csomag = "1"; //csomag tipusa
+    string csomag = "";
+    csomag += (type - '0'); //csomag tipusa
     unsigned char *sorsz = IntToChar(uresChar, sorszam);
     //copy sorszam
     for (int i = 3; i >= 0; --i)
     {
         csomag += sorsz[i];
     }
-    csomag[0] = 1;
 
     csomag += fillData(data.substr(kezdo, 507), 507);
+    return csomag;
+}
+
+string FilePackGen(char type, string data, unsigned int sorszam)
+{
+    if (data.length() == 0)
+    {
+        throw length_error("Nincs string");
+    }
+    string csomag = "";
+    csomag += (type - '0'); //csomag tipusa
+    unsigned char *sorsz = IntToChar(uresChar, sorszam);
+    //copy sorszam
+    for (int i = 3; i >= 0; --i)
+    {
+        csomag += sorsz[i];
+    }
+    csomag += fillData(data, 507);
     return csomag;
 }
 

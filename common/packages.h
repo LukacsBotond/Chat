@@ -50,9 +50,11 @@ std::string RetRegPackageGEN(char type,std::string adat);
 //megadjuk a stringet amit el akarunk kuldeni es a csomag szamat
 //a csomag szama alapjan csinal egy csomagot egy resz
 //stringgel, 
-std::string AllPackageGEN(std::string data,unsigned int sorszam);
+std::string AllPackageGEN(char type,std::string data,unsigned int sorszam);
 
 std::string PrivPackageGEN(char type,unsigned int sorszam,std::string fogado,std::string data);
+
+std::string FilePackGen(char type,std::string data, unsigned int sorszam);
 
 //0-kat ir a string vegere, hogy meglegyen a csomag merete
 std::string fillData(std::string adat,unsigned int length);

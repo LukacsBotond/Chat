@@ -14,6 +14,9 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
+#include <sstream>
+#include <list>
+
 struct thread_data
 {
     int clientSocket;
@@ -45,6 +48,12 @@ void sendAll(std::string csomag);
 
 void SendPriv(std::vector<char> buf,int sock,int id);
 
+//mivel a szam egy klienssel foglalokozik csak
+//es a kliens nem tud kuldeni ameddig az elozo kuldes be nem
+//fejezodik, igy ha fajl csomag erkezik
+//akkor addig erkezik a fajl mig utolso csomag jelzest nem kap
+void SendFile(std::vector<char> buf,int sock);
+
 int elsoUresSzal();
 
 void semStart();
@@ -64,5 +73,8 @@ bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
 
 bool decodeRECV(std::vector<char> buf,int sock,int id);
 
+std::vector<char> KovCsomag(std::list<std::vector<char>> csomagok,int utCsomag);
+
+std::vector<int> FindClinets(std::string parancs, std::string cimzett);
 
 #endif
