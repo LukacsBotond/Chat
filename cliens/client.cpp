@@ -80,10 +80,10 @@ int main()
     //	While loop:
     //cliens write the command
     cout<<"Lehetseges parancsok:\n";
-    cout<<"-all uzenet vagy -a uzenet   Mindenki aki csatlakozva van kuld egy uzenetet\n";
+    cout<<"-all uzenet vagy -a uzenet :Mindenki aki csatlakozva van kuld egy uzenetet\n";
     cout<<"-list vagy -l Visszateriti az aktiv felhasznalokat\n";
-    cout<<"-priv cimzett uzenet vagy -p cimzett uzenet Privat uzenet kuldese egy felhasznalonak";
-    cout<<"-file fajlnev vagy -f fajlnev\n -all mindenkinek \n-p felhasznalonev felhasznalonak \n-g csoportnev csoportnak\n\n\n";
+    cout<<"-priv cimzett uzenet vagy -p cimzett uzenet :Privat uzenet kuldese egy felhasznalonak\n";
+    cout<<"-file fajlnev vagy -f fajlnev\n\t-all mindenkinek \n\t-p felhasznalonev felhasznalonak \n\t-g csoportnev csoportnak\n\n\n";
 
     do
     { //		Enter lines of text

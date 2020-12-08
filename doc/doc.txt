@@ -1,4 +1,4 @@
-g++ -o server *.cpp -lpthread -std=c++17
+compile: make all
 
 Server
 

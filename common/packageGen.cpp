@@ -26,7 +26,7 @@ unsigned int CharToInt(unsigned char *CsorSz)
     return sorszam;
 }
 
-std::string fillData(string adat,unsigned int length)
+std::string fillData(string adat, unsigned int length)
 {
     unsigned int adatLen = adat.length();
     for (unsigned int i = adatLen; i < length; i++)
@@ -42,8 +42,8 @@ string RetRegPackageGEN(char type, std::string adat)
     {
         throw length_error("Nincs string");
     }
-    string csomag="";
-    csomag+=(type-'0');
+    string csomag = "";
+    csomag += (type - '0');
     csomag += fillData(adat, 511);
     return csomag;
 }
@@ -57,28 +57,34 @@ string AllPackageGEN(string data, unsigned int sorszam)
 
     unsigned int kezdo = sorszam * 507;
 
-    if(sorszam == UINT32_MAX){
-        int l = data.length();
-        int parts=l/507;
-        kezdo = (507*parts);
-    }
-    if (kezdo >= data.length())
+    if (sorszam == UINT32_MAX)
     {
-        throw out_of_range("tul nagy a csomag indexe");
+        int l = data.length();
+        int parts = l / 507;
+        kezdo = (507 * parts);
     }
-    string csomag = "1";//csomag tipusa
-    unsigned char* sorsz=IntToChar(uresChar, sorszam);
+    else
+    {
+        if (kezdo >= data.length())
+        {
+            throw out_of_range("tul nagy a csomag indexe");
+        }
+    }
+    string csomag = "1"; //csomag tipusa
+    unsigned char *sorsz = IntToChar(uresChar, sorszam);
     //copy sorszam
-    for(int i=3;i>=0;--i){
-        csomag+=sorsz[i];
+    for (int i = 3; i >= 0; --i)
+    {
+        csomag += sorsz[i];
     }
-    csomag[0]=1;
-    
-    csomag += fillData(data.substr(kezdo, 507),507);
+    csomag[0] = 1;
+
+    csomag += fillData(data.substr(kezdo, 507), 507);
     return csomag;
 }
 
-string PrivPackageGEN(char type,unsigned int sorszam,string fogado,std::string data){
+string PrivPackageGEN(char type, unsigned int sorszam, string fogado, std::string data)
+{
     if (data.length() == 0)
     {
         throw length_error("Nincs string");
@@ -88,18 +94,29 @@ string PrivPackageGEN(char type,unsigned int sorszam,string fogado,std::string d
         throw length_error("Nincs cimzett");
     }
     unsigned int kezdo = sorszam * 497;
-    if (kezdo >= data.length())
+
+    if (sorszam == UINT32_MAX)
     {
-        throw out_of_range("A string nem eleg hosszu");
+        int l = data.length();
+        int parts = l / 497;
+        kezdo = (497 * parts);
     }
-    string csomag="";
-    csomag+=type-'0';
+    else
+    {
+        if (kezdo >= data.length())
+        {
+            throw out_of_range("tul nagy a csomag indexe");
+        }
+    }
+    string csomag = "";
+    csomag += type - '0';
     //copy sorszam
-    unsigned char* sorsz=IntToChar(uresChar, sorszam);
-    for(int i=3;i>=0;--i){
-        csomag+=sorsz[i];
+    unsigned char *sorsz = IntToChar(uresChar, sorszam);
+    for (int i = 3; i >= 0; --i)
+    {
+        csomag += sorsz[i];
     }
-    csomag += fillData(fogado,10);
-    csomag += fillData(data.substr(kezdo, 497),497);
+    csomag += fillData(fogado, 10);
+    csomag += fillData(data.substr(kezdo, 497), 497);
     return csomag;
 }

@@ -4,15 +4,21 @@
 
 using namespace std;
 
-bool decodeRECV(std::vector<char> buf,int sock)
+bool decodeRECV(std::vector<char> buf,int sock,int id)
 {
     unsigned int sorszam = getSorszam(buf);
     string csomag(buf.begin(), buf.end());
     //milyen tipus erkezik
     switch (buf.at(0))
     {
-    //mindenkinek kuldes
-    case 1:
+    
+    case 0://privat uzenet
+        cout<<"privat uzenet"<<endl;
+        SendPriv(buf,sock,id);
+        return true;
+        break;
+
+    case 1://mindenkinek kuldes
         cout << "-ALL parancs erkezett" << endl;
         sendAll(csomag);
         return true;

@@ -27,7 +27,7 @@ void *Communicate(void *threadarg)
             cout<<"EXIT RES\n";
             threadExit(my_data->id, my_data->clientSocket);
         }
-        if(!decodeRECV(buf,my_data->clientSocket)){
+        if(!decodeRECV(buf,my_data->clientSocket,my_data->id)){
             cout<<"EXIT RECV\n";
             threadExit(my_data->id, my_data->clientSocket);
         }

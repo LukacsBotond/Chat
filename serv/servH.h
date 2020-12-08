@@ -3,12 +3,9 @@
 
 #include <iostream>
 #include <pthread.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <string.h>
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -46,7 +43,7 @@ void SendNames(int sock);
 
 void sendAll(std::string csomag);
 
-bool sendValsz(int sock,std::string data);
+void SendPriv(std::vector<char> buf,int sock,int id);
 
 int elsoUresSzal();
 
@@ -65,7 +62,7 @@ void kilep(void);
 unsigned int getSorszam(std::vector<char> buf);
 bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
 
-bool decodeRECV(std::vector<char> buf,int sock);
+bool decodeRECV(std::vector<char> buf,int sock,int id);
 
 
 #endif

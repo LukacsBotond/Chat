@@ -12,16 +12,16 @@ Sorszám: hányadik csomag: (4 byte)
 
 Adat: maragek charaker, ha nincs annyi akkor 0-val feltölteni
 
------------------------mindenkinek
-tipus 1
-Sorszám x
-uzenet
-
 -----------------------privát uzenet
 tipus 0
 Sorszám x
 azutan 10 byte a fogado neve
 majd adat
+
+-----------------------mindenkinek
+tipus 1
+Sorszám x
+uzenet
 
 -----------------------chat szoba
 tipus 2

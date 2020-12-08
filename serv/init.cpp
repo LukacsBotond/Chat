@@ -7,17 +7,17 @@ using namespace std;
 bool nameSet(int clientSocket, int id)
 {
     cout << "NAMESET start" << endl;
-    char buf[515];
+    vector<char> buf(550);
     int res;
     //read nameset package
-    res = recv(clientSocket, buf, 515, 0);
+    res = recv(clientSocket,  buf.data(), 550, 0);
     if(!resCheck(res)){
         threadExit(id, clientSocket);
     }
     string nev="";
     //nev kivevese
     for(int i=1;i<11;++i){
-        if(buf[i] == '\0')
+        if(buf.at(i) == '\0')
             break;
         nev+=buf[i];
     }

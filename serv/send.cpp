@@ -23,8 +23,6 @@ void sendAll(string csomag)
             cout << "hiba a kuldes soran\n";
         }
     }
-    //reset, mivel vegeztunk a tomb olvasasaval
-    cout << "LEAVE critical section\n";
     if (semop(semid, &up, 1) < 0)
     {
         cout << "Sem up error" << endl;
@@ -32,7 +30,6 @@ void sendAll(string csomag)
     }
 }
 
-//repair
 void SendNames(int sock)
 {
     if (semop(semid, &down, 1) < 0)
@@ -51,13 +48,69 @@ void SendNames(int sock)
     int kezdo = 0;
     string returnPack;
     unsigned int osszcsomag = (RetNev.length() / 511) + 1;
-    for(unsigned int i=0;i<osszcsomag;i++){
-        returnPack=RetRegPackageGEN('5',RetNev.substr(kezdo,511));
-        if(!sendPack(sock,returnPack)){
-            cout<<"HIBA NEV kuldeskor\n";
+    for (unsigned int i = 0; i < osszcsomag; i++)
+    {
+        returnPack = RetRegPackageGEN('5', RetNev.substr(kezdo, 511));
+        if (!sendPack(sock, returnPack))
+        {
+            cout << "HIBA NEV kuldeskor\n";
             return;
         }
     }
+    if (semop(semid, &up, 1) < 0)
+    {
+        cout << "Sem up error" << endl;
+        return;
+    }
+}
+
+void SendPriv(vector<char> buf,int sock,int id)
+{
+    string csomag(buf.begin(), buf.end());
+    string cimzett = "";
+    for (int i = 5; i < 16; ++i)
+    {
+        if (buf.at(i) == '\0')
+            break;
+        cimzett += buf[i];
+    }
+    cout << "Cimzett: " << cimzett << endl;
+    if (semop(semid, &down, 1) < 0)
+    {
+        cout << "Sem down error" << endl;
+        return;
+    }
+    string RetPack;
+
+    auto it = find(begin(nevek), end(nevek), cimzett);
+    int x = it - begin(nevek);
+    if (x < NUM_THREADS)
+    {
+        cout << "Van ilyen felhasznalo" << endl;
+        //RetPack = fillData("NO", 512);
+    }
+    else
+    { //nincs benne a nev
+        cout << "Nincs ilyen felhasznalo" << endl;
+        RetPack = RetRegPackageGEN('9'+1, "Error, nincs ilyen aktiv felhasznalo");
+        if (!sendPack(sock, RetPack))
+        {
+            cout << "hiba a kuldes soran\n";
+        }
+        return;
+    }
+
+    //nevev kicserelese a cimzettrol a feladora
+    for(int i=5;i<15;i++){
+        csomag[i]=nevek[id][i-5];
+    }
+    csomag[15]=':';
+
+    if (!sendPack(td[x].clientSocket, csomag))
+    {
+        cout << "hiba a kuldes soran\n";
+    }
+
     if (semop(semid, &up, 1) < 0)
     {
         cout << "Sem up error" << endl;
