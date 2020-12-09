@@ -17,8 +17,8 @@ void *Communicate(void *threadarg)
 
     while (true)
     {
-        vector<char> buf(550);
-        int res = recv(my_data->clientSocket, buf.data(), 550, 0);
+        vector<char> buf(514);
+        int res = recv(my_data->clientSocket, buf.data(), 514, 0);
         cout << "res: " << res << endl;
         if (!resCheck(res))
         {

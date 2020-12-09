@@ -52,14 +52,30 @@ bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
     return false;
 }
 
-std::vector<char> KovCsomag(std::list<std::vector<char>> csomagok, int utCsomag)
+void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek,unsigned int &utCsomag)
 {
+    unsigned int sorszam;
+    bool talalt = true;
+    while (talalt)
+    {
+        talalt = false;
+        for (auto it : csomagok)
+        {
+            sorszam = getSorszam(it);
+            if(sorszam == utCsomag){
+                talalt=true;
+                string csomag(it.begin(),it.end());
+                sendVector(kliensek,csomag,utCsomag);
+                csomagok.remove(it);
+                break;
+            }
+        }
+    }
 }
 
 std::vector<int> FindClinets(std::string parancs, std::string cimzett)
 {
     vector<int> kliensek;
-
     switch (parancs[1])
     {
     case 'a':
@@ -79,7 +95,6 @@ std::vector<int> FindClinets(std::string parancs, std::string cimzett)
         if (x >= NUM_THREADS)
         {
             cout << "Nincs ilyen felhasznalo" << endl;
-            throw out_of_range("");
         }
         kliensek.push_back(td[x].clientSocket);
         break;
@@ -87,7 +102,6 @@ std::vector<int> FindClinets(std::string parancs, std::string cimzett)
     default:
     {
         cout << "ismeretlen parancs\n";
-        throw out_of_range("");
         break;
     }
     }

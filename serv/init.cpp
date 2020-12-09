@@ -144,7 +144,7 @@ void printNevek()
     {
         if (nevek[i] != "")
         {
-            cout << nevek[i] << ", ";
+            cout << nevek[i] << " ";
         }
     }
     cout << endl;

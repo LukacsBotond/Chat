@@ -54,6 +54,8 @@ void SendPriv(std::vector<char> buf,int sock,int id);
 //akkor addig erkezik a fajl mig utolso csomag jelzest nem kap
 void SendFile(std::vector<char> buf,int sock);
 
+void sendVector(std::vector<int> kliensek,std::string csomag,unsigned int &utCsomag);
+
 int elsoUresSzal();
 
 void semStart();
@@ -73,7 +75,7 @@ bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
 
 bool decodeRECV(std::vector<char> buf,int sock,int id);
 
-std::vector<char> KovCsomag(std::list<std::vector<char>> csomagok,int utCsomag);
+void KovCsomag(std::list<std::vector<char>> &csomagok,std::vector<int> kliensek,unsigned int &utCsomag);
 
 std::vector<int> FindClinets(std::string parancs, std::string cimzett);
 

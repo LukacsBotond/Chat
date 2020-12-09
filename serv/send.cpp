@@ -120,17 +120,18 @@ void SendPriv(vector<char> buf, int sock, int id)
 void SendFile(vector<char> buf, int sock)
 {
     unsigned int sorszam = getSorszam(buf);
-    unsigned int utCsomag = 0;
-    string cimzett="";
-    string parancs="";
-    string fajlnev="";
+    unsigned int utCsomag = 1;
+    string cimzettbad = "";
+    string cimzett = "";
+    string parancs = "";
+    string fajlnev = "";
     list<vector<char>> csomagvar;
     //elso csomagba nem erkezik a fajlbol
     if (sorszam == 0)
     {
         //tipus, sorszam kihagyasa
-        string adat(buf.begin() + 15, buf.end());
-        cout<<"adat: "<<adat<<endl;
+        string adat(buf.begin() + 15, buf.begin() + 512);
+        cout << "adat: " << adat << endl;
         string tmp;
         stringstream ss(adat);
         ss >> tmp; //-file skip
@@ -144,16 +145,23 @@ void SendFile(vector<char> buf, int sock)
         if (parancs != "-a")
         {
             ss >> tmp;
-            cimzett = tmp;
+            cimzettbad = tmp;
+            //nev vegerol a 0-k levevese
+            for (int i = 0; i < 11; ++i)
+            {
+                if (cimzettbad[i] == '\0')
+                    break;
+                cimzett += cimzettbad[i];
+            }
         }
         cout << "fajlnev: " << fajlnev << " parancs " << parancs << " cimzett: " << cimzett << endl;
     }
-    /*
-    bool vege = false;
-    while (vege)
+
+    while (true)
     {
-        vector<char> buf(550);
-        int res = recv(sock, buf.data(), 550, 0);
+        cout << "FILE RECV:" << endl;
+        vector<char> buf(514);
+        int res = recv(sock, buf.data(), 514, 0);
         string csomag(buf.begin(), buf.end());
         cout << "res: " << res << endl;
         if (!resCheck(res))
@@ -162,10 +170,29 @@ void SendFile(vector<char> buf, int sock)
             return;
         }
         sorszam = getSorszam(buf);
+        cout<<sorszam<<endl;
         if (sorszam == UINT32_MAX)
         { //utolso csomag
             break;
         }
+
+        if (semop(semid, &down, 1) < 0)
+        {
+            cout << "Sem down error" << endl;
+            throw out_of_range("");
+        }
+        vector<int> kliensek = FindClinets(parancs, cimzett);
+
+        if (kliensek.size() == 0)
+        {
+            csomag = RetRegPackageGEN('9' + 2, "ERROR: a cimzett/ek nem elerhatoek");
+            if (!sendPack(sock, csomag))
+            {
+                cout << "Sikertelen kuldes" << endl;
+            }
+            break;
+        }
+
         //egy nagyobb csomag erkezett, eltaroljuk, majd kesobb
         //elkuldjuk
         if (!correctPack(sorszam, utCsomag))
@@ -175,25 +202,26 @@ void SendFile(vector<char> buf, int sock)
         }
         else
         { //jo csomag, amit el kell kuldeni egy kliensnek
-            if (semop(semid, &down, 1) < 0)
-            {
-                cout << "Sem down error" << endl;
-                throw out_of_range("");
-            }
-            vector<int> kliensek = FindClinets(parancs, cimzett);
-            for (unsigned int i = 0; i < kliensek.size(); i++)
-            {
-                if (!sendPack(kliensek.at(i), csomag))
-                {
-                    cout << "Sikertelen kuldes" << endl;
-                }
-            }
-            if (semop(semid, &up, 1) < 0)
-            {
-                cout << "Sem up error" << endl;
-                throw out_of_range("");
-            }
+            sendVector(kliensek, csomag, utCsomag);
+        }
+        KovCsomag(csomagvar, kliensek, utCsomag);
+
+        if (semop(semid, &up, 1) < 0)
+        {
+            cout << "Sem up error" << endl;
+            throw out_of_range("");
         }
     }
-    */
+}
+
+void sendVector(vector<int> kliensek, string csomag, unsigned int &utCsomag)
+{
+    for (unsigned int i = 0; i < kliensek.size(); i++)
+    {
+        if (!sendPack(kliensek.at(i), csomag))
+        {
+            cout << "Sikertelen kuldes" << endl;
+        }
+        utCsomag++;
+    }
 }

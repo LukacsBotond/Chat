@@ -63,11 +63,11 @@ bool AllSend(string uzenet)
         { //utolso csomag
             if (i == osszcsomag - 1)
             {
-                pack = AllPackageGEN('1',uzenet.substr(kezdo), UINT32_MAX);
+                pack = AllPackageGEN('1', uzenet.substr(kezdo), UINT32_MAX);
             }
             else
             {
-                pack = AllPackageGEN('1',uzenet.substr(kezdo, 507), sorszam);
+                pack = AllPackageGEN('1', uzenet.substr(kezdo, 507), sorszam);
             }
         }
         catch (out_of_range &e)
@@ -108,6 +108,10 @@ bool SendPriv()
     string adat = userInput.substr(kezdo);
     for (int i = 0; i < osszcsomag; i++)
     {
+        if (stop)
+        {
+            break;
+        }
         string pack;
         //send
         try
@@ -174,7 +178,11 @@ bool SendFile()
     vector<char> resz(550);
     while (!sendFile.eof())
     {
-        cout << "sending...."<<sorszam<<endl;
+        if (stop)
+        {
+            break;
+        }
+        cout << "sending...." << sorszam << endl;
         sendFile.read(resz.data(), 507);
         string reszCs(resz.begin(), resz.end());
         //cout<<reszCs<<endl;
@@ -187,8 +195,14 @@ bool SendFile()
         sorszam++;
     }
     //vege a fajlnak
-    cout<<"Elkuldve\n";
+    cout << "Elkuldve\n";
     csomag = PrivPackageGEN('3', UINT32_MAX, "fill", "fill");
+    if (!sendPack(sock, csomag))
+    {
+        cout << "valami nem jo" << endl;
+        return false;
+    }
+    sendFile.close();
 
     return true;
 }

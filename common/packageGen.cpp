@@ -6,7 +6,7 @@ using namespace std;
 
 unsigned char *IntToChar(unsigned char ures[4], unsigned int sorszam)
 {
-    for (int i = 3; i >= 0; i--)
+    for (int i = 0; i <= 3; i++)
     {
         ures[i] = sorszam % 256;
         sorszam /= 256;
@@ -16,12 +16,12 @@ unsigned char *IntToChar(unsigned char ures[4], unsigned int sorszam)
 
 unsigned int CharToInt(unsigned char *CsorSz)
 {
-    int sorszam = 0;
+    unsigned int sorszam = 0;
     int mult = 1;
     for (int i = 3; i >= 0; i--)
     {
-        sorszam += ((unsigned int)CsorSz[i] * mult);
-        mult *= 255;
+        sorszam += ((unsigned char)CsorSz[i] * mult);
+        mult *= 256;
     }
     return sorszam;
 }

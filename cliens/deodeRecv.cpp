@@ -24,10 +24,12 @@ void decodeRevc(vector<char> buf)
 
     case 10:
         cout << "ERROR:";
+        stop = true;
         kezd = 1;
         break;
 
     default:
+        cout<<"ismeretlen parancs"<<endl;
         break;
     }
     string uzenet(buf.begin() + kezd, buf.end());

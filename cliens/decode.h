@@ -5,6 +5,7 @@
 #include "../common/packages.h"
 
 inline bool vege = false;
+inline bool stop = false;
 
 inline int sock;
 inline unsigned int sorszam = 0;
