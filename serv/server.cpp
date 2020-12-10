@@ -19,7 +19,7 @@ void *Communicate(void *threadarg)
     {
         vector<char> buf(514);
         int res = recv(my_data->clientSocket, buf.data(), 514, 0);
-        cout << "res: " << res << endl;
+        cout << "Kezdo res: " << res << endl;
         if (!resCheck(res))
         {
             cout<<"EXIT RES\n";

@@ -42,16 +42,6 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
     return false;
 }
 
-bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
-{
-    //az a csomag erkezett amire vartunk
-    if (sorszam == csomagszamlal)
-    {
-        return true;
-    }
-    return false;
-}
-
 void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek,unsigned int &utCsomag)
 {
     unsigned int sorszam;
@@ -67,6 +57,7 @@ void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek,unsi
                 string csomag(it.begin(),it.end());
                 sendVector(kliensek,csomag,utCsomag);
                 csomagok.remove(it);
+                utCsomag++;
                 break;
             }
         }

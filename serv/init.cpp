@@ -1,46 +1,46 @@
 #include "servH.h"
-#include "../common/packages.h"
-#include "../common/comon.h"
 
 using namespace std;
 
 bool nameSet(int clientSocket, int id)
 {
     cout << "NAMESET start" << endl;
-    vector<char> buf(550);
+    vector<char> buf(514);
     int res;
     //read nameset package
-    res = recv(clientSocket,  buf.data(), 550, 0);
-    if(!resCheck(res)){
+    res = recv(clientSocket, buf.data(), 550, 0);
+    if (!resCheck(res))
+    {
         threadExit(id, clientSocket);
     }
-    string nev="";
+    string nev = "";
     //nev kivevese
-    for(int i=1;i<11;++i){
-        if(buf.at(i) == '\0')
+    for (int i = 1; i < 11; ++i)
+    {
+        if (buf.at(i) == '\0')
             break;
-        nev+=buf[i];
+        nev += buf[i];
     }
     cout << "Kapott nev: " << nev << endl;
-    
+
     ///////////////////////////////////////////////////////////
     if (semop(semid, &down, 1) < 0)
     {
         cout << "Sem down error" << endl;
         return false;
     }
-    string RetPack="";
-    RetPack+='4'-'0';
+    string RetPack = "";
+    RetPack += '4' - '0';
     auto it = find(begin(nevek), end(nevek), nev);
     if (it != end(nevek))
     { //benne van mar a nev
         cout << "Ez a nev mar foglalt" << endl;
-        RetPack = fillData("NO",512);
+        RetPack = fillData("NO", 512);
     }
     else
     { //nincs benne a nev
-        cout<<"Nincs ilyen nev"<<endl;
-        RetPack = fillData("OK",512);
+        cout << "Nincs ilyen nev" << endl;
+        RetPack = fillData("OK", 512);
         nevek[id] = nev;
     }
     if (semop(semid, &up, 1) < 0)
@@ -49,10 +49,9 @@ bool nameSet(int clientSocket, int id)
         return false;
     }
     ////////////////////////////////////////////////////////////
-    
-    
+
     //res = send(clientSocket, RetPack.c_str(), RetPack.length()+1, 0);
-    if (!sendPack(clientSocket,RetPack))
+    if (!sendPack(clientSocket, RetPack))
     {
         cout << "hiba a kuldes soran\n";
         return false;
@@ -69,7 +68,6 @@ bool nameSet(int clientSocket, int id)
             return false;
         }
     }
-    
 }
 
 int elsoUresSzal()
@@ -98,6 +96,24 @@ void semStart()
     {
         cout << "INIT\n";
         exit(-1);
+    }
+}
+
+void semup()
+{
+    if (semop(semid, &up, 1) < 0)
+    {
+        cout << "Sem up error" << endl;
+        throw out_of_range("");
+    }
+}
+
+void semdown()
+{
+    if (semop(semid, &down, 1) < 0)
+    {
+        cout << "Sem down error" << endl;
+        throw out_of_range("");
     }
 }
 
@@ -154,7 +170,7 @@ void threadExit(int id, int sock)
 {
     // Close the socket
     close(sock);
-    cout<<"SZAL lezarasa\n";
+    cout << "SZAL lezarasa\n";
     if (semop(semid, &down, 1) < 0)
     {
         cout << "Sem down error" << endl;

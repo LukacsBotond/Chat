@@ -175,24 +175,43 @@ bool SendFile()
     {
         return false;
     }
-    vector<char> resz(550);
+    sendFile.seekg(0);
     while (!sendFile.eof())
     {
         if (stop)
         {
             break;
         }
+
+        vector<char> resz(509);
         cout << "sending...." << sorszam << endl;
-        sendFile.read(resz.data(), 507);
-        string reszCs(resz.begin(), resz.end());
+
+        sendFile.read(resz.data(), 509);
+        int hossz = sendFile.gcount();
+        string reszCs(resz.begin(), resz.begin()+hossz);
         //cout<<reszCs<<endl;
-        csomag = FilePackGen('3', reszCs, sorszam);
+        try
+        {
+            csomag = FilePackGen('3', reszCs, sorszam);
+        }
+        catch (length_error &e)
+        {
+            std::cout << e.what() << '\n';
+            csomag = PrivPackageGEN('3', UINT32_MAX, "fill", "fill");
+            if (!sendPack(sock, csomag))
+            {
+                cout << "valami nem jo" << endl;
+                return false;
+            }
+            return false;
+        }
         if (!sendPack(sock, csomag))
         {
             cout << "valami nem jo" << endl;
             return false;
         }
         sorszam++;
+        resz.clear();
     }
     //vege a fajlnak
     cout << "Elkuldve\n";

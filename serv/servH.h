@@ -1,21 +1,16 @@
 #ifndef servH_H
 #define servH_H
 
-#include <iostream>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <string>
-#include <algorithm>
-#include <vector>
+#include "../common/comon.h"
+#include "../common/packages.h"
 
+#include <algorithm>
+#include <cstring>
+
+#include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
-
-#include <sstream>
-#include <list>
 
 struct thread_data
 {
@@ -71,7 +66,6 @@ void kilep(void);
 ///////////////////////////// SUpport functions
 
 unsigned int getSorszam(std::vector<char> buf);
-bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
 
 bool decodeRECV(std::vector<char> buf,int sock,int id);
 
@@ -79,4 +73,7 @@ void KovCsomag(std::list<std::vector<char>> &csomagok,std::vector<int> kliensek,
 
 std::vector<int> FindClinets(std::string parancs, std::string cimzett);
 
+
+void semup();
+void semdown();
 #endif

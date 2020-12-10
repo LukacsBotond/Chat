@@ -55,10 +55,13 @@ int main()
 
     do
     { //		Enter lines of text
-        //cout << "PARANCS>: ";
+        cout << "PARANCS>: ";
         getline(cin, userInput);
         if(!decodeCommand()){
             cout<<"Ismeretlen parancs, probalja ujra"<<endl;
+        }
+        else{
+            cout<<"Sikeresen elkuldve\n";
         }
     } while (!vege);
     return 0;

@@ -2,20 +2,17 @@
 #define packages_H
 
 #include <iostream>
-#include <iostream>
-#include <pthread.h>
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <string.h>
-#include <string>
-#include <vector>
 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
+
 
 inline unsigned char uresChar[4]={0};
 

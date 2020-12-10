@@ -41,3 +41,14 @@ bool sendPack(int socket,string pack)
     }
     return true;
 }
+
+bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
+{
+    //az a csomag erkezett amire vartunk
+    if (sorszam == csomagszamlal)
+    {
+        return true;
+    }
+    return false;
+}
+

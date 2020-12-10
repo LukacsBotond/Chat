@@ -3,16 +3,13 @@
 
 #include "../common/comon.h"
 #include "../common/packages.h"
+#include <fstream>
 
 inline bool vege = false;
 inline bool stop = false;
 
 inline int sock;
 inline unsigned int sorszam = 0;
-
-inline int semid;
-inline struct sembuf down = {0, -1, 0};
-inline struct sembuf up= {0, +1, 0};
 
 inline std::string userInput;
 
@@ -37,6 +34,9 @@ bool SendFile();
 
 //szervertol kapott adat feldolgozasa
 void decodeRevc(std::vector<char> buf);
+
+void reciveFile(std::vector<char> buf);
+void kovCsomagKliens(std::list<std::vector<char>> &csomagvar,std::ofstream &file,unsigned int &utCsomag);
 
 
 void kilep(void);
