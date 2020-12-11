@@ -39,20 +39,19 @@ void decodeRevc(vector<char> buf)
         break;
     }
     string uzenet(buf.begin() + kezd, buf.end());
-    cout << "SERVER>:" << uzenet << endl;
-}
+    cout << "SERVER>:" << uzenet << endl;}
 
 void reciveFile(vector<char> buf)
 {
     unsigned int sorszam = getSorszam(buf);
     unsigned int utCsomag = 0;
-    string cimzettbad = "";
     string cimzett = "";
     string parancs = "";
     string fajlnev = "";
     list<vector<char>> csomagvar;
     if (sorszam == 0)
     {
+        string cimzettbad = "";
         //tipus, sorszam kihagyasa
         string adat(buf.begin() + 15, buf.begin() + 512);
         cout << "adat: " << adat << endl;
@@ -87,12 +86,31 @@ void reciveFile(vector<char> buf)
     {
         cout << "Fajl iras hiba" << endl;
     }
-
+    vector<char> buf1(514);
     while (true)
     {
         //cout << "FILE RECV:" << endl;
         vector<char> buf(514);
         int res = recv(sock, buf.data(), 514, 0);
+        //cout << "res: " << res << endl;
+        while (res < 514)
+        {
+            int bufLastIndex=res;
+            vector<char> bufextra(514);
+            int extra = recv(sock, bufextra.data(), 514 - res, 0);
+            if (!resCheck(extra))
+            {
+                cout << "EXIT RES\n";
+                return;
+            }
+            res += extra;
+            cout << "extra res: " << extra << endl;
+            for (int i = 0; i < extra; i++)
+            {
+                buf.at(bufLastIndex+i) =bufextra.at(i);
+            }
+        }
+
         std::vector<char> data(buf.begin() + 5, buf.end());
         if (!resCheck(res))
         {
@@ -100,11 +118,15 @@ void reciveFile(vector<char> buf)
             return;
         }
         sorszam = getSorszam(buf);
+        if (sorszam > 1000)
+        {
+            cout << "";
+        }
         cout << "Sorszam " << sorszam << endl;
         if (sorszam == UINT32_MAX)
         { //utolso csomag
             cout << "VEGE a fajl kuldesnek\n";
-            return;
+            break;
         }
 
         //egy nagyobb csomag erkezett, eltaroljuk, majd kesobb
@@ -120,16 +142,16 @@ void reciveFile(vector<char> buf)
             file.write(data.data(), data.size());
             utCsomag++;
         }
-        kovCsomagKliens(csomagvar,file,utCsomag);
+        kovCsomagKliens(csomagvar, file, utCsomag);
+        buf1 = buf;
     }
-
 
     file.close();
 }
 
-void kovCsomagKliens(list<vector<char>> &csomagvar, ofstream &file,unsigned int &utCsomag)
+void kovCsomagKliens(list<vector<char>> &csomagvar, ofstream &file, unsigned int &utCsomag)
 {
-    cout<<"keres"<<endl;
+    //cout << "keres" << endl;
     unsigned int sorszam;
     bool talalt = true;
     while (talalt)
@@ -140,9 +162,9 @@ void kovCsomagKliens(list<vector<char>> &csomagvar, ofstream &file,unsigned int 
             sorszam = getSorszam(it);
             if (sorszam == utCsomag)
             {
-                cout<<"talal"<<endl;
+                cout << "talal" << endl;
                 talalt = true;
-                file.write(it.data(),it.size());
+                file.write(it.data(), it.size());
                 csomagvar.remove(it);
                 utCsomag++;
                 break;

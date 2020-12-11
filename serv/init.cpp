@@ -13,6 +13,20 @@ bool nameSet(int clientSocket, int id)
     {
         threadExit(id, clientSocket);
     }
+    while (res < 514)
+    {
+        vector<char> bufextra(514);
+        int extra = recv(clientSocket, bufextra.data(), 514 - res, 0);
+        if(!resCheck(extra)){
+            threadExit(id, clientSocket);
+        }
+        res += extra;
+        cout << "extra res: " << extra << endl;
+        for (int i = 0; i < extra; i++)
+        {
+            buf.push_back(bufextra.at(i));
+        }
+    }
     string nev = "";
     //nev kivevese
     for (int i = 1; i < 11; ++i)

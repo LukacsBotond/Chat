@@ -19,14 +19,31 @@ void *Communicate(void *threadarg)
     {
         vector<char> buf(514);
         int res = recv(my_data->clientSocket, buf.data(), 514, 0);
+        while (res < 514)
+        {
+            vector<char> bufextra(514);
+            int extra = recv(my_data->clientSocket, bufextra.data(), 514 - res, 0);
+            if (!resCheck(extra))
+            {
+                cout << "EXIT RES\n";
+                threadExit(my_data->id, my_data->clientSocket);
+            }
+            res += extra;
+            cout << "extra res: " << extra << endl;
+            for (int i = 0; i < extra; i++)
+            {
+                buf.push_back(bufextra.at(i));
+            }
+        }
         cout << "Kezdo res: " << res << endl;
         if (!resCheck(res))
         {
-            cout<<"EXIT RES\n";
+            cout << "EXIT RES\n";
             threadExit(my_data->id, my_data->clientSocket);
         }
-        if(!decodeRECV(buf,my_data->clientSocket,my_data->id)){
-            cout<<"EXIT RECV\n";
+        if (!decodeRECV(buf, my_data->clientSocket, my_data->id))
+        {
+            cout << "EXIT RECV\n";
             threadExit(my_data->id, my_data->clientSocket);
         }
 

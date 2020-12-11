@@ -188,6 +188,10 @@ bool SendFile()
 
         sendFile.read(resz.data(), 509);
         int hossz = sendFile.gcount();
+        if(hossz == 0){
+            cout<<"nem sikerult tobbet olvasni"<<endl;
+            break;
+        }
         string reszCs(resz.begin(), resz.begin()+hossz);
         //cout<<reszCs<<endl;
         try

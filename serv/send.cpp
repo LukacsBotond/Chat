@@ -158,6 +158,17 @@ void SendFile(vector<char> buf, int sock)
         int res = recv(sock, buf.data(), 514, 0);
         string csomag(buf.begin(), buf.end());
         cout << "res: " << res << endl;
+        while (res < 514)
+        {
+            vector<char> bufextra(514);
+            int extra = recv(sock, bufextra.data(), 514 - res, 0);
+            res += extra;
+            cout << "extra res: " << extra << endl;
+            for (int i = 0; i < extra; i++)
+            {
+                buf.push_back(bufextra.at(i));
+            }
+        }
         if (!resCheck(res))
         {
             cout << "EXIT RES\n";

@@ -8,10 +8,10 @@ void *recv(void *threadarg)
 {
     struct thread_data *my_data;
     my_data = (struct thread_data *)threadarg;
-    vector<char> buf(515);
+    vector<char> buf(514);
     while (true)
     {
-        int bytesReceived = recv(my_data->sock, buf.data(), 515, 0);
+        int bytesReceived = recv(my_data->sock, buf.data(), 514, 0);
         cout<<"bytes: "<<bytesReceived<<endl;
         if(!resCheck(bytesReceived)){
             cout<<"bytes: "<<bytesReceived<<endl;
