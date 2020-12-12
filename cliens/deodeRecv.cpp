@@ -7,6 +7,7 @@ using namespace std;
 void decodeRevc(vector<char> buf)
 {
     int kezd = 0;
+    stop = false;
     switch (buf.at(0))
     {
     case 0:
@@ -17,6 +18,11 @@ void decodeRevc(vector<char> buf)
         cout << "Globalis uzenet: ";
         kezd = 5;
         break;
+    case 2:
+        cout<<"Csoporttol erkezik az uzenet: \n";
+        kezd = 5;
+        break;
+
     case 3:
         cout << "Fajl erkezik" << endl;
         reciveFile(buf);
@@ -25,6 +31,11 @@ void decodeRevc(vector<char> buf)
 
     case 5:
         cout << "Lista: ";
+        kezd = 1;
+        break;
+
+    case 9:
+        cout<<"szerver visszateritett: ";
         kezd = 1;
         break;
 
@@ -41,11 +52,10 @@ void decodeRevc(vector<char> buf)
     string uzenet(buf.begin() + kezd, buf.end());
     cout << "SERVER>:" << uzenet << endl;}
 
-void reciveFile(vector<char> buf)
+void reciveFile(vector<char> bufbe)
 {
-    unsigned int sorszam = getSorszam(buf);
+    unsigned int sorszam = getSorszam(bufbe);
     unsigned int utCsomag = 0;
-    string cimzett = "";
     string parancs = "";
     string fajlnev = "";
     list<vector<char>> csomagvar;
@@ -53,49 +63,27 @@ void reciveFile(vector<char> buf)
     {
         string cimzettbad = "";
         //tipus, sorszam kihagyasa
-        string adat(buf.begin() + 15, buf.begin() + 512);
+        string adat(bufbe.begin() + 15, bufbe.begin() + 512);
         cout << "adat: " << adat << endl;
         string tmp;
         stringstream ss(adat);
         ss >> tmp; //-file skip
-
         ss >> tmp; //fajlnev
         fajlnev = tmp;
-
-        ss >> tmp; //parancs
-        parancs = tmp;
-
-        if (parancs != "-a")
-        {
-            ss >> tmp;
-            cimzettbad = tmp;
-            //nev vegerol a 0-k levevese
-            for (int i = 0; i < 11; ++i)
-            {
-                if (cimzettbad[i] == '\0')
-                    break;
-                cimzett += cimzettbad[i];
-            }
-        }
-        cout << "fajlnev: " << fajlnev << " parancs " << parancs << " cimzett: " << cimzett << endl;
         utCsomag = 1;
     }
-
     ofstream file(fajlnev, std::ifstream::binary);
     if (file.fail())
     {
         cout << "Fajl iras hiba" << endl;
     }
-    vector<char> buf1(514);
+    vector<char> buff(514);
     while (true)
     {
-        //cout << "FILE RECV:" << endl;
-        vector<char> buf(514);
-        int res = recv(sock, buf.data(), 514, 0);
-        //cout << "res: " << res << endl;
+        int res = recv(sock, buff.data(), 514, 0);
+        //cout<<"res:"<<res<<endl;
         while (res < 514)
         {
-            int bufLastIndex=res;
             vector<char> bufextra(514);
             int extra = recv(sock, bufextra.data(), 514 - res, 0);
             if (!resCheck(extra))
@@ -103,39 +91,31 @@ void reciveFile(vector<char> buf)
                 cout << "EXIT RES\n";
                 return;
             }
-            res += extra;
-            cout << "extra res: " << extra << endl;
+            cout<<"extra res:"<<extra<<endl;
             for (int i = 0; i < extra; i++)
             {
-                buf.at(bufLastIndex+i) =bufextra.at(i);
+                buff.at(res+i) =bufextra.at(i);
             }
+            res += extra;
         }
-
-        std::vector<char> data(buf.begin() + 5, buf.end());
+        std::vector<char> data(buff.begin() + 5, buff.end());
         if (!resCheck(res))
         {
             cout << "EXIT RES\n";
             return;
         }
-        sorszam = getSorszam(buf);
-        if (sorszam > 1000)
-        {
-            cout << "";
-        }
-        cout << "Sorszam " << sorszam << endl;
+        sorszam = getSorszam(buff);
         if (sorszam == UINT32_MAX)
         { //utolso csomag
             cout << "VEGE a fajl kuldesnek\n";
             break;
         }
-
         //egy nagyobb csomag erkezett, eltaroljuk, majd kesobb
         //elkuldjuk
         if (!correctPack(sorszam, utCsomag))
         {
             cout << "SKIPP" << endl;
-            csomagvar.push_back(buf);
-            continue;
+            csomagvar.push_back(buff);
         }
         else
         { //jo csomag, ki kell irni
@@ -143,7 +123,6 @@ void reciveFile(vector<char> buf)
             utCsomag++;
         }
         kovCsomagKliens(csomagvar, file, utCsomag);
-        buf1 = buf;
     }
 
     file.close();

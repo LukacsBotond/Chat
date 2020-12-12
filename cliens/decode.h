@@ -26,18 +26,17 @@ void sendName();
 //meghivja a megfelelo send fuggvenyt
 bool decodeCommand();
 
-
 bool AllSend(std::string uzenet);
 bool ListSend();
-bool SendPriv();
+bool SendPriv(char type);
 bool SendFile();
+bool Groupinit(char type,std::string csoportNev);
 
 //szervertol kapott adat feldolgozasa
 void decodeRevc(std::vector<char> buf);
 
 void reciveFile(std::vector<char> buf);
-void kovCsomagKliens(std::list<std::vector<char>> &csomagvar,std::ofstream &file,unsigned int &utCsomag);
-
+void kovCsomagKliens(std::list<std::vector<char>> &csomagvar, std::ofstream &file, unsigned int &utCsomag);
 
 void kilep(void);
 void MakeSocket();

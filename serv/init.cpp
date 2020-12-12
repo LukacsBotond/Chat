@@ -17,54 +17,35 @@ bool nameSet(int clientSocket, int id)
     {
         vector<char> bufextra(514);
         int extra = recv(clientSocket, bufextra.data(), 514 - res, 0);
-        if(!resCheck(extra)){
+        if (!resCheck(res))
+        {
+            cout << "EXIT RES\n";
             threadExit(id, clientSocket);
         }
-        res += extra;
-        cout << "extra res: " << extra << endl;
         for (int i = 0; i < extra; i++)
-        {
-            buf.push_back(bufextra.at(i));
-        }
+            buf.at(i + res) = bufextra.at(i);
+        res += extra;
     }
-    string nev = "";
     //nev kivevese
-    for (int i = 1; i < 11; ++i)
-    {
-        if (buf.at(i) == '\0')
-            break;
-        nev += buf[i];
-    }
-    cout << "Kapott nev: " << nev << endl;
-
+    string badname(buf.begin() + 1, buf.begin() + 11);
+    string nev = getNev(badname);
     ///////////////////////////////////////////////////////////
-    if (semop(semid, &down, 1) < 0)
-    {
-        cout << "Sem down error" << endl;
-        return false;
-    }
+    semdown();
     string RetPack = "";
     RetPack += '4' - '0';
     auto it = find(begin(nevek), end(nevek), nev);
     if (it != end(nevek))
     { //benne van mar a nev
-        cout << "Ez a nev mar foglalt" << endl;
         RetPack = fillData("NO", 512);
     }
     else
     { //nincs benne a nev
-        cout << "Nincs ilyen nev" << endl;
         RetPack = fillData("OK", 512);
         nevek[id] = nev;
     }
-    if (semop(semid, &up, 1) < 0)
-    {
-        cout << "Sem up error" << endl;
-        return false;
-    }
+    semup();
     ////////////////////////////////////////////////////////////
 
-    //res = send(clientSocket, RetPack.c_str(), RetPack.length()+1, 0);
     if (!sendPack(clientSocket, RetPack))
     {
         cout << "hiba a kuldes soran\n";
@@ -79,9 +60,60 @@ bool nameSet(int clientSocket, int id)
         }
         else
         {
+            cout << "sikertelen nev beiras" << endl;
             return false;
         }
     }
+}
+
+void CreateGroup(std::vector<char> buf, int sock)
+{
+    string badName(buf.begin() + 1, buf.begin() + 11);
+    string csopNev = getNev(badName);
+    string pack = "";
+    semdown();
+    auto it = csoport.find(csopNev);
+    if (it == csoport.end())
+    { //nincs ilyen csoport
+        pack = RetRegPackageGEN('9', "Sikeres Csoport letrehozas");
+        list<int> csoportLista;
+        csoportLista.push_back(sock);
+        csoport.insert(pair<string, list<int>>(csopNev, csoportLista));
+    }
+    else
+    {
+        pack = RetRegPackageGEN('9', "CsoportNev mar foglalt");
+    }
+
+    if (!sendPack(sock, pack))
+    {
+        cout << "Sikertelen kuldes" << endl;
+    }
+    semup();
+}
+
+void JoinGroup(std::vector<char> buf, int sock)
+{
+    string badName(buf.begin() + 1, buf.begin() + 11);
+    string csopNev = getNev(badName);
+    string pack = "";
+    semdown();
+    auto it = csoport.find(csopNev);
+    if (it == csoport.end())
+    { //nincs ilyen csoport
+        pack = RetRegPackageGEN('9', "Nincs ilyen nevu csoport");
+    }
+    else
+    {
+        it->second.push_back(sock);
+        pack = RetRegPackageGEN('9', "Sikeres Csatlakozas");
+    }
+
+    if (!sendPack(sock, pack))
+    {
+        cout << "Sikertelen kuldes" << endl;
+    }
+    semup();
 }
 
 int elsoUresSzal()

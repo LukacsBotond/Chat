@@ -11,10 +11,21 @@ void *recv(void *threadarg)
     vector<char> buf(514);
     while (true)
     {
-        int bytesReceived = recv(my_data->sock, buf.data(), 514, 0);
-        cout<<"bytes: "<<bytesReceived<<endl;
-        if(!resCheck(bytesReceived)){
-            cout<<"bytes: "<<bytesReceived<<endl;
+        int res = recv(my_data->sock, buf.data(), 514, 0);
+        while (res < 514)
+        {
+            vector<char> bufextra(514);
+            int extra = recv(sock, bufextra.data(), 514 - res, 0);
+            //cout << "extra res: " << extra << endl;
+            for (int i = 0; i < extra; i++)
+            {
+                buf.at(i + res) = bufextra.at(i);
+            }
+            res += extra;
+        }
+        if (!resCheck(res))
+        {
+            cout << "bytes: " << res << endl;
             vege = true;
             pthread_exit(NULL);
         }
@@ -28,7 +39,7 @@ int main()
     pthread_t threads[1];
     struct thread_data td[1];
     //	Create a socket
-    
+
     MakeSocket();
 
     //send Username to server, wait for it to say it is fine/not fine
@@ -36,7 +47,7 @@ int main()
     sendName();
 
     ///recv resze
-    
+
     td[0].sock = sock;
     int rc = pthread_create(&threads[0], NULL, recv, (void *)&td[0]);
     if (rc)
@@ -47,21 +58,25 @@ int main()
 
     //	While loop:
     //cliens write the command
-    cout<<"Lehetseges parancsok:\n";
-    cout<<"-all uzenet vagy -a uzenet :Mindenki aki csatlakozva van kuld egy uzenetet\n";
-    cout<<"-list vagy -l Visszateriti az aktiv felhasznalokat\n";
-    cout<<"-priv cimzett uzenet vagy -p cimzett uzenet :Privat uzenet kuldese egy felhasznalonak\n";
-    cout<<"-file fajlnev vagy -f fajlnev\n\t-a mindenkinek \n\t-p felhasznalonev felhasznalonak \n\t-g csoportnev csoportnak\n\n\n";
-
+    cout << "Lehetseges parancsok:\n";
+    cout << "-all uzenet vagy -a uzenet :Mindenki aki csatlakozva van kuld egy uzenetet\n";
+    cout << "-list vagy -l Visszateriti az aktiv felhasznalokat\n";
+    cout << "-priv cimzett uzenet vagy -p cimzett uzenet :Privat uzenet kuldese egy felhasznalonak\n";
+    cout << "-file fajlnev vagy -f fajlnev\n\t-a mindenkinek \n\t-p felhasznalonev felhasznalonak \n\t-g csoportnev csoportnak\n";
+    cout << "-c chatszobanev: Chatszoba letrehozasa\n";
+    cout << "-j chatszobaNev :-chatszobaba valo belepes\n";
+    cout << "-g chatszobaNev uzenet: csoportnak az uzenet elkuldese\n";
     do
     { //		Enter lines of text
         cout << "PARANCS>: ";
         getline(cin, userInput);
-        if(!decodeCommand()){
-            cout<<"Ismeretlen parancs, probalja ujra"<<endl;
+        if (!decodeCommand())
+        {
+            cout << "Ismeretlen parancs, probalja ujra" << endl;
         }
-        else{
-            cout<<"Sikeresen elkuldve\n";
+        else
+        {
+            cout << "Sikeresen elkuldve\n";
         }
     } while (!vege);
     return 0;

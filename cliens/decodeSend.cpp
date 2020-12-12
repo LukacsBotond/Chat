@@ -34,11 +34,25 @@ bool decodeCommand()
     }
     if (buf == "-priv" || buf == "-p")
     {
-        return SendPriv();
+        return SendPriv('0');
     }
     if (buf == "-file" || buf == "-f")
     {
         return SendFile();
+    }
+    if (buf == "-c")
+    {
+        ss >> buf;
+        return Groupinit('6', buf);
+    }
+    if (buf == "-j")
+    {
+        ss >> buf;
+        return Groupinit('7', buf);
+    }
+    if (buf == "-g")
+    {
+        return SendPriv('2');
     }
 
     return false;
@@ -60,15 +74,8 @@ bool AllSend(string uzenet)
         string pack;
         //send
         try
-        { //utolso csomag
-            if (i == osszcsomag - 1)
-            {
-                pack = AllPackageGEN('1', uzenet.substr(kezdo), UINT32_MAX);
-            }
-            else
-            {
-                pack = AllPackageGEN('1', uzenet.substr(kezdo, 507), sorszam);
-            }
+        {
+            pack = AllPackageGEN('1', uzenet.substr(kezdo, 507), sorszam);
         }
         catch (out_of_range &e)
         {
@@ -92,7 +99,7 @@ bool AllSend(string uzenet)
     return true;
 }
 
-bool SendPriv()
+bool SendPriv(char type)
 {
     string buf;
     string fogado;
@@ -116,14 +123,7 @@ bool SendPriv()
         //send
         try
         { //utolso csomag
-            if (i == osszcsomag - 1)
-            {
-                pack = PrivPackageGEN('0', UINT32_MAX, fogado, adat);
-            }
-            else
-            {
-                pack = PrivPackageGEN('0', sorszam, fogado, adat);
-            }
+            pack = PrivPackageGEN(type, sorszam, fogado, adat);
         }
         catch (out_of_range &e)
         {
@@ -184,15 +184,33 @@ bool SendFile()
         }
 
         vector<char> resz(509);
-        cout << "sending...." << sorszam << endl;
+        //cout << "sending...." << sorszam << endl;
 
         sendFile.read(resz.data(), 509);
         int hossz = sendFile.gcount();
-        if(hossz == 0){
-            cout<<"nem sikerult tobbet olvasni"<<endl;
+        while (hossz < 509)
+        {
+            vector<char> bufextra(514);
+            sendFile.read(bufextra.data(), 509 - hossz);
+            int extra = sendFile.gcount();
+            if (extra == 0)
+            {
+                cout << "nem sikerult tobbet olvasni" << endl;
+                break;
+            }
+            cout << "extra res:" << extra << endl;
+            for (int i = 0; i < extra; i++)
+            {
+                buf.at(hossz + i) = bufextra.at(i);
+            }
+            hossz += extra;
+        }
+        if (hossz == 0)
+        {
+            cout << "nem sikerult tobbet olvasni" << endl;
             break;
         }
-        string reszCs(resz.begin(), resz.begin()+hossz);
+        string reszCs(resz.begin(), resz.begin() + hossz);
         //cout<<reszCs<<endl;
         try
         {
@@ -205,7 +223,6 @@ bool SendFile()
             if (!sendPack(sock, csomag))
             {
                 cout << "valami nem jo" << endl;
-                return false;
             }
             return false;
         }
@@ -228,4 +245,15 @@ bool SendFile()
     sendFile.close();
 
     return true;
+}
+
+bool Groupinit(char type, std::string csoportNev)
+{
+    if (csoportNev.length() > 10)
+    {
+        cout << "A CsoportNev tul hosszu\n";
+        return false;
+    }
+    string retPack = RetRegPackageGEN(type, csoportNev);
+    return sendPack(sock, retPack);
 }

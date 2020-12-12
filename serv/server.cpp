@@ -13,33 +13,27 @@ void *Communicate(void *threadarg)
 
     while (nameSet(my_data->clientSocket, my_data->id) == false)
         ;
-    cout << "sikeres nev valasztas" << endl;
-
     while (true)
     {
         vector<char> buf(514);
         int res = recv(my_data->clientSocket, buf.data(), 514, 0);
-        while (res < 514)
-        {
-            vector<char> bufextra(514);
-            int extra = recv(my_data->clientSocket, bufextra.data(), 514 - res, 0);
-            if (!resCheck(extra))
-            {
-                cout << "EXIT RES\n";
-                threadExit(my_data->id, my_data->clientSocket);
-            }
-            res += extra;
-            cout << "extra res: " << extra << endl;
-            for (int i = 0; i < extra; i++)
-            {
-                buf.push_back(bufextra.at(i));
-            }
-        }
-        cout << "Kezdo res: " << res << endl;
         if (!resCheck(res))
         {
             cout << "EXIT RES\n";
             threadExit(my_data->id, my_data->clientSocket);
+        }
+        while (res < 514)
+        {
+            vector<char> bufextra(514);
+            int extra = recv(my_data->clientSocket, bufextra.data(), 514 - res, 0);
+            if (!resCheck(res))
+            {
+                cout << "EXIT RES\n";
+                threadExit(my_data->id, my_data->clientSocket);
+            }
+            for (int i = 0; i < extra; i++)
+                buf.at(i + res) = bufextra.at(i);
+            res += extra;
         }
         if (!decodeRECV(buf, my_data->clientSocket, my_data->id))
         {
@@ -71,11 +65,7 @@ int main()
         int clientSocket = accept(listening, (sockaddr *)&client, &clientSize);
         cout << "main() : creating thread, " << endl;
         //tomb modositasa
-        if (semop(semid, &down, 1) < 0)
-        {
-            cout << "Sem down mod error" << endl;
-            exit(-1);
-        }
+        semdown();
         int i = elsoUresSzal();
         if (i < 0)
         {
@@ -85,11 +75,7 @@ int main()
         td[i].clientSocket = clientSocket;
         td[i].id = i;
         szal[i] = 1;
-        if (semop(semid, &up, 1) < 0)
-        {
-            cout << "Sem up mod error" << endl;
-            exit(-1);
-        }
+        semup();
         rc = pthread_create(&threads[i], NULL, Communicate, (void *)&td[i]);
         if (rc)
         {

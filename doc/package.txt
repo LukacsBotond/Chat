@@ -3,10 +3,11 @@ csomag méret 512 byte
 Tipus: (1 byte)
     0-privát
     1-all
-    2-csoport
+    2-csoport send
     3-fajl
     4-Bejelentkezes
     5-list
+    6-csoport letrehozas
 
 Sorszám: hányadik csomag: (4 byte)
 
@@ -43,4 +44,7 @@ adat tobbi
 tipus 5
 adat tobbi
 
+-----------------------chatszoba letrehozas
+tipus 6
+adat tobbi
 

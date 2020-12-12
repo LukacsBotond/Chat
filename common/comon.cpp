@@ -20,7 +20,6 @@ bool resCheck(int res)
     return true;
 }
 
-
 unsigned int getSorszam(std::vector<char> buf)
 {
     unsigned char Csorsz[4];
@@ -32,7 +31,7 @@ unsigned int getSorszam(std::vector<char> buf)
     return sorszam;
 }
 
-bool sendPack(int socket,string pack)
+bool sendPack(int socket, string pack)
 {
     int res = send(socket, pack.c_str(), 514, 0);
     if (!resCheck(res))
@@ -51,4 +50,3 @@ bool correctPack(unsigned int sorszam, unsigned int csomagszamlal)
     }
     return false;
 }
-

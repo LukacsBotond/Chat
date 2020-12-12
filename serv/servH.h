@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cstring>
+#include <map>
+#include <list>
 
 #include <pthread.h>
 #include <sys/ipc.h>
@@ -28,11 +30,11 @@ inline bool szal[NUM_THREADS];
 inline struct thread_data td[NUM_THREADS];
 inline std::string nevek[NUM_THREADS] = {""};
 
+inline std::map<std::string,std::list<int>> csoport;
+
 inline sockaddr_in client;
 inline socklen_t clientSize = sizeof(client);
 inline int listening;
-
-bool nameSet(int clientSocket, int id);
 
 void *Communicate(void *threadarg);
 
@@ -50,6 +52,11 @@ void SendPriv(std::vector<char> buf,int sock,int id);
 void SendFile(std::vector<char> buf,int sock);
 
 void sendVector(std::vector<int> kliensek,std::string csomag,unsigned int &utCsomag);
+
+//////////////////////////init.cpp
+bool nameSet(int clientSocket, int id);
+void CreateGroup(std::vector<char> buf,int sock);
+void JoinGroup(std::vector<char> buf,int sock);
 
 int elsoUresSzal();
 
@@ -73,6 +80,7 @@ void KovCsomag(std::list<std::vector<char>> &csomagok,std::vector<int> kliensek,
 
 std::vector<int> FindClinets(std::string parancs, std::string cimzett);
 
+std::string getNev(std::string namebad);
 
 void semup();
 void semdown();

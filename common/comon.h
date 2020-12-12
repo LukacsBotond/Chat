@@ -14,4 +14,5 @@ bool sendPack(int socket, std::string pack);
 
 bool correctPack(unsigned int sorszam,unsigned int csomagszamlal);
 
+
 #endif

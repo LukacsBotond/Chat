@@ -57,15 +57,12 @@ void SendPriv(vector<char> buf, int sock, int id)
             break;
         cimzett += buf[i];
     }
-    cout << "Cimzett: " << cimzett << endl;
-    semdown();
-    string RetPack;
 
+    string RetPack;
+    semdown();
     auto it = find(begin(nevek), end(nevek), cimzett);
     int x = it - begin(nevek);
-    if (x < NUM_THREADS)
-        cout << "Van ilyen felhasznalo" << endl;
-    else
+    if (x >= NUM_THREADS)
     { //nincs benne a nev
         cout << "Nincs ilyen felhasznalo" << endl;
         RetPack = RetRegPackageGEN('9' + 1, "Error, nincs ilyen aktiv felhasznalo");
@@ -73,11 +70,7 @@ void SendPriv(vector<char> buf, int sock, int id)
         {
             cout << "hiba a kuldes soran\n";
         }
-        if (semop(semid, &up, 1) < 0)
-        {
-            cout << "Sem up error" << endl;
-            return;
-        }
+        semup();
         return;
     }
     //nevev kicserelese a cimzettrol a feladora
@@ -153,11 +146,10 @@ void SendFile(vector<char> buf, int sock)
 
     while (true)
     {
-        cout << "FILE RECV:" << endl;
         vector<char> buf(514);
         int res = recv(sock, buf.data(), 514, 0);
         string csomag(buf.begin(), buf.end());
-        cout << "res: " << res << endl;
+        //cout << "res: " << res << endl;
         while (res < 514)
         {
             vector<char> bufextra(514);
@@ -175,7 +167,6 @@ void SendFile(vector<char> buf, int sock)
             return;
         }
         sorszam = getSorszam(buf);
-        cout << sorszam << endl;
         semdown();
         vector<int> kliensek = FindClinets(parancs, cimzett);
         if (sorszam == UINT32_MAX)
@@ -201,6 +192,7 @@ void SendFile(vector<char> buf, int sock)
         //elkuldjuk
         if (!correctPack(sorszam, utCsomag))
         {
+            cout<<"Skipp\n";
             csomagvar.push_back(buf);
             semup();
             continue;
@@ -220,9 +212,42 @@ void sendVector(vector<int> kliensek, string csomag, unsigned int &utCsomag)
     for (unsigned int i = 0; i < kliensek.size(); i++)
     {
         if (!sendPack(kliensek.at(i), csomag))
-        {
             cout << "Sikertelen kuldes" << endl;
-        }
-        utCsomag++;
     }
+    utCsomag++;
+}
+
+void SendGroup(vector<char> buf, int sock)
+{
+    string csomag(buf.begin(), buf.end());
+    string cimzett = "";
+    for (int i = 5; i < 16; ++i)
+    {
+        if (buf.at(i) == '\0')
+            break;
+        cimzett += buf[i];
+    }
+    string RetPack;
+    semdown();
+    auto it = csoport.find(cimzett);
+    if (it == csoport.end())
+    {
+        cout << "Nincs ilyen CsoportNev\n";
+        RetPack = RetRegPackageGEN('9' + 1, "Error, nincs ilyen Csoport");
+        if (!sendPack(sock, RetPack))
+        {
+            cout << "hiba a kuldes soran\n";
+        }
+        semup();
+        return;
+    }
+    vector<int> kliensek;
+    for (auto const i : it->second)
+    {
+        kliensek.push_back(i);
+    }
+    unsigned int csomagSzam = 0;
+    sendVector(kliensek, csomag, csomagSzam);
+
+    semup();
 }

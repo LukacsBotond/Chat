@@ -10,7 +10,6 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
     //milyen tipus erkezik
     switch (buf.at(0))
     {
-
     case 0: //privat uzenet
         cout << "privat uzenet" << endl;
         SendPriv(buf, sock, id);
@@ -20,6 +19,12 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
     case 1: //mindenkinek kuldes
         cout << "-ALL parancs erkezett" << endl;
         sendAll(csomag);
+        return true;
+        break;
+    
+    case 2:
+        cout<<"-Csoport uzenet erkezett\n";
+
         return true;
         break;
 
@@ -34,6 +39,17 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
         return true;
         break;
 
+    case 6:
+        cout << "-create chatszoba parancs erkezett\n";
+        CreateGroup(buf, sock);
+        return true;
+        break;
+    case 7:
+        cout<<"-join chatszoba parancs erkezett\n";
+        JoinGroup(buf,sock);
+        return true;
+        break;
+
     default:
         cout << "Nincs ilyen parancs\n";
         return false;
@@ -42,7 +58,7 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
     return false;
 }
 
-void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek,unsigned int &utCsomag)
+void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek, unsigned int &utCsomag)
 {
     unsigned int sorszam;
     bool talalt = true;
@@ -52,10 +68,11 @@ void KovCsomag(std::list<std::vector<char>> &csomagok, vector<int> kliensek,unsi
         for (auto it : csomagok)
         {
             sorszam = getSorszam(it);
-            if(sorszam == utCsomag){
-                talalt=true;
-                string csomag(it.begin(),it.end());
-                sendVector(kliensek,csomag,utCsomag);
+            if (sorszam == utCsomag)
+            {
+                talalt = true;
+                string csomag(it.begin(), it.end());
+                sendVector(kliensek, csomag, utCsomag);
                 csomagok.remove(it);
                 utCsomag++;
                 break;
@@ -97,4 +114,16 @@ std::vector<int> FindClinets(std::string parancs, std::string cimzett)
     }
     }
     return kliensek;
+}
+
+std::string getNev(std::string namebad)
+{
+    string cimzett = "";
+    for (int i = 0; i < 11; ++i)
+    {
+        if (namebad[i] == '\0')
+            break;
+        cimzett += namebad[i];
+    }
+    return cimzett;
 }
