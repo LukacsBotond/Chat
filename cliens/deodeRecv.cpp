@@ -19,10 +19,13 @@ void decodeRevc(vector<char> buf)
         kezd = 5;
         break;
     case 2:
-        cout<<"Csoporttol erkezik az uzenet: \n";
-        kezd = 5;
+    {
+        cout << "Csoporttol erkezik az uzenet: \n";
+        string csoport(buf.begin() + 5, buf.begin() + 15);
+        cout << csoport << ": ";
+        kezd = 15;
         break;
-
+    }
     case 3:
         cout << "Fajl erkezik" << endl;
         reciveFile(buf);
@@ -35,7 +38,7 @@ void decodeRevc(vector<char> buf)
         break;
 
     case 9:
-        cout<<"szerver visszateritett: ";
+        cout << "szerver visszateritett: ";
         kezd = 1;
         break;
 
@@ -50,7 +53,8 @@ void decodeRevc(vector<char> buf)
         break;
     }
     string uzenet(buf.begin() + kezd, buf.end());
-    cout << "SERVER>:" << uzenet << endl;}
+    cout << uzenet << endl;
+}
 
 void reciveFile(vector<char> bufbe)
 {
@@ -91,10 +95,10 @@ void reciveFile(vector<char> bufbe)
                 cout << "EXIT RES\n";
                 return;
             }
-            cout<<"extra res:"<<extra<<endl;
+            cout << "extra res:" << extra << endl;
             for (int i = 0; i < extra; i++)
             {
-                buff.at(res+i) =bufextra.at(i);
+                buff.at(res + i) = bufextra.at(i);
             }
             res += extra;
         }
@@ -114,7 +118,7 @@ void reciveFile(vector<char> bufbe)
         //elkuldjuk
         if (!correctPack(sorszam, utCsomag))
         {
-            cout << "SKIPP" << endl;
+            cout << "SKIPP " << sorszam << " " << utCsomag << endl;
             csomagvar.push_back(buff);
         }
         else
@@ -142,11 +146,11 @@ void kovCsomagKliens(list<vector<char>> &csomagvar, ofstream &file, unsigned int
             if (sorszam == utCsomag)
             {
                 cout << "talal" << endl;
+                cin.ignore();
                 talalt = true;
                 file.write(it.data(), it.size());
                 csomagvar.remove(it);
                 utCsomag++;
-                break;
             }
         }
     }

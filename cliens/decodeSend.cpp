@@ -188,6 +188,7 @@ bool SendFile()
 
         sendFile.read(resz.data(), 509);
         int hossz = sendFile.gcount();
+        //cout<<"hossz: "<<hossz<<endl;
         while (hossz < 509)
         {
             vector<char> bufextra(514);

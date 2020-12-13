@@ -24,7 +24,7 @@ bool decodeRECV(std::vector<char> buf, int sock, int id)
     
     case 2:
         cout<<"-Csoport uzenet erkezett\n";
-
+        SendGroup(buf,sock);
         return true;
         break;
 

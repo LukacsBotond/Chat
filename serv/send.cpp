@@ -154,12 +154,12 @@ void SendFile(vector<char> buf, int sock)
         {
             vector<char> bufextra(514);
             int extra = recv(sock, bufextra.data(), 514 - res, 0);
-            res += extra;
             cout << "extra res: " << extra << endl;
             for (int i = 0; i < extra; i++)
             {
-                buf.push_back(bufextra.at(i));
+                buf.at(i+res) = bufextra.at(i);
             }
+            res += extra;
         }
         if (!resCheck(res))
         {
@@ -192,17 +192,14 @@ void SendFile(vector<char> buf, int sock)
         //elkuldjuk
         if (!correctPack(sorszam, utCsomag))
         {
-            cout<<"Skipp\n";
+            cout << "Skipp\n";
             csomagvar.push_back(buf);
-            semup();
-            continue;
         }
         else
         { //jo csomag, amit el kell kuldeni egy kliensnek
             sendVector(kliensek, csomag, utCsomag);
         }
         KovCsomag(csomagvar, kliensek, utCsomag);
-
         semup();
     }
 }
@@ -227,10 +224,11 @@ void SendGroup(vector<char> buf, int sock)
             break;
         cimzett += buf[i];
     }
+    cout<<"csoport: "<<cimzett<<endl;
     string RetPack;
     semdown();
-    auto it = csoport.find(cimzett);
-    if (it == csoport.end())
+    auto it = csoportMap.find(cimzett);
+    if (it == csoportMap.end())
     {
         cout << "Nincs ilyen CsoportNev\n";
         RetPack = RetRegPackageGEN('9' + 1, "Error, nincs ilyen Csoport");

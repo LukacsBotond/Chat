@@ -30,7 +30,7 @@ inline bool szal[NUM_THREADS];
 inline struct thread_data td[NUM_THREADS];
 inline std::string nevek[NUM_THREADS] = {""};
 
-inline std::map<std::string,std::list<int>> csoport;
+inline std::map<std::string,std::list<int>> csoportMap;
 
 inline sockaddr_in client;
 inline socklen_t clientSize = sizeof(client);
@@ -57,6 +57,7 @@ void sendVector(std::vector<int> kliensek,std::string csomag,unsigned int &utCso
 bool nameSet(int clientSocket, int id);
 void CreateGroup(std::vector<char> buf,int sock);
 void JoinGroup(std::vector<char> buf,int sock);
+void SendGroup(std::vector<char> buf, int sock);
 
 int elsoUresSzal();
 

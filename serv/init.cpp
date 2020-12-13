@@ -72,13 +72,13 @@ void CreateGroup(std::vector<char> buf, int sock)
     string csopNev = getNev(badName);
     string pack = "";
     semdown();
-    auto it = csoport.find(csopNev);
-    if (it == csoport.end())
+    auto it = csoportMap.find(csopNev);
+    if (it == csoportMap.end())
     { //nincs ilyen csoport
         pack = RetRegPackageGEN('9', "Sikeres Csoport letrehozas");
         list<int> csoportLista;
         csoportLista.push_back(sock);
-        csoport.insert(pair<string, list<int>>(csopNev, csoportLista));
+        csoportMap.insert(pair<string, list<int>>(csopNev, csoportLista));
     }
     else
     {
@@ -98,15 +98,23 @@ void JoinGroup(std::vector<char> buf, int sock)
     string csopNev = getNev(badName);
     string pack = "";
     semdown();
-    auto it = csoport.find(csopNev);
-    if (it == csoport.end())
+    auto it = csoportMap.find(csopNev);
+    if (it == csoportMap.end())
     { //nincs ilyen csoport
         pack = RetRegPackageGEN('9', "Nincs ilyen nevu csoport");
     }
     else
     {
-        it->second.push_back(sock);
-        pack = RetRegPackageGEN('9', "Sikeres Csatlakozas");
+        auto lit = find(it->second.begin(), it->second.end(), sock);
+        if (lit != it->second.end())
+        {
+            pack = RetRegPackageGEN('9', "Mar csatlakozva van ehez a csoporthoz");
+        }
+        else
+        {
+            it->second.push_back(sock);
+            pack = RetRegPackageGEN('9', "Sikeres Csatlakozas");
+        }
     }
 
     if (!sendPack(sock, pack))
@@ -222,6 +230,12 @@ void threadExit(int id, int sock)
         cout << "Sem down error" << endl;
         exit(-1);
     }
+
+    for(auto it:csoportMap){
+        it.second.remove(sock);
+    }
+
+
     szal[id] = 0;
     nevek[id] = "";
     if (semop(semid, &up, 1) < 0)

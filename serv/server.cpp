@@ -13,9 +13,9 @@ void *Communicate(void *threadarg)
 
     while (nameSet(my_data->clientSocket, my_data->id) == false)
         ;
+    vector<char> buf(514);
     while (true)
     {
-        vector<char> buf(514);
         int res = recv(my_data->clientSocket, buf.data(), 514, 0);
         if (!resCheck(res))
         {
